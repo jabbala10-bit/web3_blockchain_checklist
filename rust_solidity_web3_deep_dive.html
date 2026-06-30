@@ -1,0 +1,649 @@
+
+<h2 class="sr-only">In-depth guide to Solidity and Rust for Web3 blockchain developers — data types, storage, functions, security patterns, Anchor framework, Solana accounts, and use cases.</h2>
+<style>
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.gw{padding:.5rem 0 2rem}
+#gnav{display:none;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:.5px solid var(--border)}
+.gtab{padding:5px 13px;border-radius:var(--radius);border:.5px solid var(--border);background:transparent;color:var(--text-secondary);font-size:13px;cursor:pointer}
+.gtab:hover,.gtab.active{background:var(--surface-1);color:var(--text-primary);border-color:var(--border-strong)}
+.gtab.active{font-weight:500}
+.lbl{font-size:11px;color:var(--text-muted);font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin:0 0 10px}
+.sec-t{font-size:20px;font-weight:500;color:var(--text-primary);margin:4px 0 5px}
+.sec-s{font-size:13px;color:var(--text-secondary);margin:0 0 1.5rem;line-height:1.65}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:12px;margin-bottom:1.5rem}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:12px;margin-bottom:1.5rem}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:12px;margin-bottom:1.5rem}
+.card{background:var(--surface-1);border:.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem}
+.ct{font-size:13px;font-weight:500;color:var(--text-primary);margin:0 0 5px}
+.cb{font-size:13px;color:var(--text-secondary);margin:0;line-height:1.5}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;margin-right:4px;margin-bottom:4px}
+.ba{background:var(--bg-accent);color:var(--text-accent)}
+.bg{background:var(--bg-success);color:var(--text-success)}
+.bw{background:var(--bg-warning);color:var(--text-warning)}
+.bd{background:var(--bg-danger);color:var(--text-danger)}
+.bp{background:var(--bg-pro);color:var(--text-pro)}
+.div{border:none;border-top:.5px solid var(--border);margin:1.5rem 0}
+.code{background:var(--surface-0);border:.5px solid var(--border);border-radius:var(--radius);padding:1rem;font-family:var(--font-mono);font-size:11.5px;color:var(--text-primary);line-height:1.75;overflow-x:auto;margin-bottom:1rem;white-space:pre}
+.code-t{font-size:11px;font-weight:500;color:var(--text-muted);margin:0 0 4px;font-family:var(--font-mono)}
+.kw{color:var(--text-accent)}
+.str{color:var(--text-success)}
+.cmt{color:var(--text-muted)}
+.typ{color:var(--text-warning)}
+.mac{color:var(--text-pro)}
+.ok{color:var(--text-success)}
+.err{color:var(--text-danger)}
+.num{color:var(--text-accent)}
+.cmp{display:grid;gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem}
+.cc{background:var(--surface-1);padding:.7rem 1rem}
+.cc0{background:var(--surface-0);padding:.7rem 1rem}
+.ch{font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:.5rem}
+.cr{font-size:12px;color:var(--text-secondary);padding:3px 0;border-top:.5px solid var(--border)}
+table.t{width:100%;font-size:12px;border-collapse:collapse;margin-bottom:1.5rem}
+table.t th{text-align:left;padding:7px 10px;color:var(--text-secondary);font-weight:500;border-bottom:.5px solid var(--border);background:var(--surface-0)}
+table.t td{padding:6px 10px;color:var(--text-secondary);border-bottom:.5px solid var(--border);font-family:var(--font-mono);font-size:11.5px}
+table.t td.label{font-family:var(--font-sans);font-size:12px;font-weight:500;color:var(--text-primary)}
+table.t tr:last-child td{border-bottom:none}
+.col2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+.pill-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1rem}
+.ac{border-color:var(--border-accent)!important}
+.sc{border-color:var(--border-success)!important}
+.dc{border-color:var(--border-danger)!important}
+.wc{border-color:var(--border-warning)!important}
+.pc{border-color:var(--border-pro)!important}
+.inline-badge{font-family:var(--font-mono);font-size:11px;background:var(--surface-0);border:.5px solid var(--border);border-radius:4px;padding:1px 5px;color:var(--text-primary)}
+.note{background:var(--bg-warning);border:.5px solid var(--border-warning);border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--text-warning);margin-bottom:1rem}
+.good{background:var(--bg-success);border:.5px solid var(--border-success);border-radius:var(--radius);padding:10px 12px;font-size:12px;color:var(--text-success);margin-bottom:1rem}
+</style>
+<div class="gw">
+<div id="gnav"></div>
+
+<!-- S1: AT A GLANCE -->
+<div class="gsec" id="s1" data-label="At a glance">
+<p class="lbl">Two languages, two paradigms</p>
+<h3 class="sec-t">Solidity vs Rust for Web3</h3>
+<p class="sec-s">Solidity is the EVM-native language — purpose-built for smart contracts. Rust is a systems language adopted for blockchains needing raw performance and memory safety without garbage collection.</p>
+<div class="cmp" style="grid-template-columns:1.4fr 1fr 1fr">
+  <div class="cc0"><div class="ch">Dimension</div><div class="cr">Designed for</div><div class="cr">Paradigm</div><div class="cr">Memory management</div><div class="cr">Type system</div><div class="cr">Learning curve</div><div class="cr">Compilation target</div><div class="cr">Error handling</div><div class="cr">Upgradeability</div><div class="cr">Test tooling</div></div>
+  <div class="cc" style="border-left:2px solid var(--border-accent)"><div class="ch" style="color:var(--text-accent)">Solidity</div><div class="cr">EVM smart contracts</div><div class="cr">OOP + declarative</div><div class="cr">EVM handles it</div><div class="cr">Strong, static</div><div class="cr">Medium</div><div class="cr">EVM bytecode</div><div class="cr">require / revert / custom errors</div><div class="cr">Proxy patterns (UUPS, transparent)</div><div class="cr">Hardhat, Foundry, Truffle</div></div>
+  <div class="cc" style="border-left:2px solid var(--border-pro)"><div class="ch" style="color:var(--text-pro)">Rust</div><div class="cr">Systems + blockchain runtime</div><div class="cr">Functional + imperative</div><div class="cr">Ownership model (no GC)</div><div class="cr">Strong, static + lifetimes</div><div class="cr">Steep</div><div class="cr">BPF (Solana), WASM (NEAR)</div><div class="cr">Result&lt;T, E&gt; everywhere</div><div class="cr">Program upgrades via authority</div><div class="cr">Anchor tests, solana-program-test</div></div>
+</div>
+<p class="lbl">Target chains and ecosystems</p>
+<div class="col2">
+  <div class="card ac">
+    <span class="badge ba" style="margin-bottom:10px">Solidity</span>
+    <p class="ct">EVM ecosystem</p>
+    <div class="pill-row" style="margin-top:8px">
+      <span class="badge ba">Ethereum</span><span class="badge ba">Polygon</span><span class="badge ba">Arbitrum</span><span class="badge ba">Optimism</span><span class="badge ba">Base</span><span class="badge ba">Avalanche C-Chain</span><span class="badge ba">BNB Chain</span><span class="badge ba">zkSync</span><span class="badge ba">Scroll</span><span class="badge ba">Linea</span>
+    </div>
+    <p class="cb" style="margin-top:10px;font-size:12px">One language, 30+ EVM-compatible chains. Deploy the same bytecode everywhere. Over 500,000 verified contracts on Etherscan.</p>
+  </div>
+  <div class="card pc">
+    <span class="badge bp" style="margin-bottom:10px">Rust</span>
+    <p class="ct">High-performance chains</p>
+    <div class="pill-row" style="margin-top:8px">
+      <span class="badge bp">Solana</span><span class="badge bp">NEAR Protocol</span><span class="badge bp">Polkadot / Substrate</span><span class="badge bp">Cosmos (CosmWasm)</span><span class="badge bp">Aptos (Move, Rust SDK)</span><span class="badge bp">Sui</span>
+    </div>
+    <p class="cb" style="margin-top:10px;font-size:12px">Each chain has its own runtime. Rust's safety guarantees and zero-cost abstractions make it the language of choice for chains prioritizing throughput.</p>
+  </div>
+</div>
+<p class="lbl">Decision guide</p>
+<div class="g2">
+  <div class="card ac"><i class="ti ti-brand-ethereum" aria-hidden="true" style="font-size:20px;color:var(--text-accent);margin-bottom:8px"></i><p class="ct">Choose Solidity when…</p><p class="cb">You're deploying to Ethereum or any EVM chain. Your priority is the largest dev ecosystem, maximum tooling, and DeFi composability with existing Uniswap/Aave/Compound contracts.</p></div>
+  <div class="card pc"><i class="ti ti-brand-rust" aria-hidden="true" style="font-size:20px;color:var(--text-pro);margin-bottom:8px"></i><p class="ct">Choose Rust when…</p><p class="cb">You're building on Solana, NEAR, or Polkadot. You need extreme throughput, low latency, or are writing chain infrastructure / validators. You want compile-time memory safety guarantees.</p></div>
+</div>
+<button onclick="sendPrompt('What are the most important differences between writing a DeFi protocol in Solidity on Ethereum versus building the same protocol in Rust on Solana?')">Compare building DeFi: Solidity vs Rust ↗</button>
+</div>
+
+<!-- S2: SOLIDITY DATA AND STORAGE -->
+<div class="gsec" id="s2" data-label="Solidity: storage">
+<p class="lbl">Solidity — data types and storage layout</p>
+<h3 class="sec-t">Types, storage slots, and memory</h3>
+<p class="sec-s">Every state variable in a Solidity contract occupies 32-byte "slots" on the EVM. Understanding this layout is critical for gas optimization and avoiding storage collision bugs in upgradeable contracts.</p>
+<p class="lbl">Value types and sizes</p>
+<div style="overflow-x:auto;margin-bottom:1.5rem">
+<table class="t">
+  <thead><tr><th>Type</th><th>Size</th><th>Range / notes</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td class="label">bool</td><td>1 byte (in slot)</td><td>true / false</td><td>bool public isActive;</td></tr>
+    <tr><td class="label">uint8 … uint256</td><td>1–32 bytes</td><td>Unsigned. uint = uint256</td><td>uint256 public totalSupply;</td></tr>
+    <tr><td class="label">int8 … int256</td><td>1–32 bytes</td><td>Signed. int = int256</td><td>int128 public temperature;</td></tr>
+    <tr><td class="label">address</td><td>20 bytes</td><td>Ethereum address (EOA or contract)</td><td>address public owner;</td></tr>
+    <tr><td class="label">address payable</td><td>20 bytes</td><td>Can receive ETH via .transfer()</td><td>address payable treasury;</td></tr>
+    <tr><td class="label">bytes1 … bytes32</td><td>1–32 bytes</td><td>Fixed-size byte arrays</td><td>bytes32 public merkleRoot;</td></tr>
+    <tr><td class="label">bytes</td><td>dynamic</td><td>Dynamic byte array (heap)</td><td>bytes public data;</td></tr>
+    <tr><td class="label">string</td><td>dynamic</td><td>UTF-8 encoded, expensive</td><td>string public name;</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="lbl">Storage slot packing — gas critical</p>
+<div class="code"><span class="cmt">// SPDX-License-Identifier: MIT
+// pragma solidity ^0.8.20;</span>
+
+<span class="kw">contract</span> StorageLayout {
+    <span class="cmt">// Each slot = 32 bytes. Pack small types together to save gas.</span>
+
+    <span class="cmt">// ❌ INEFFICIENT: three separate 32-byte slots (96 bytes total)</span>
+    <span class="kw">bool</span> public flagA;      <span class="cmt">// slot 0 (wastes 31 bytes)</span>
+    <span class="kw">uint256</span> public amount; <span class="cmt">// slot 1</span>
+    <span class="kw">bool</span> public flagB;     <span class="cmt">// slot 2 (wastes 31 bytes)</span>
+
+    <span class="cmt">// ✅ EFFICIENT: packs into two slots (64 bytes total)</span>
+    <span class="kw">uint128</span> public valueA; <span class="cmt">// slot 3, bytes 0–15</span>
+    <span class="kw">uint64</span>  public valueB; <span class="cmt">// slot 3, bytes 16–23  ← packed!</span>
+    <span class="kw">uint32</span>  public valueC; <span class="cmt">// slot 3, bytes 24–27  ← packed!</span>
+    <span class="kw">bool</span>    public flagC;  <span class="cmt">// slot 3, bytes 28     ← packed!</span>
+    <span class="kw">uint256</span> public bigVal; <span class="cmt">// slot 4 (needs full slot)</span>
+
+    <span class="cmt">// Mappings always occupy their own slot (content stored at keccak256(key, slot))</span>
+    mapping(<span class="typ">address</span> => <span class="typ">uint256</span>) <span class="kw">public</span> balances;           <span class="cmt">// slot 5</span>
+    mapping(<span class="typ">address</span> => mapping(<span class="typ">address</span> => <span class="typ">uint256</span>)) <span class="kw">public</span> allowances; <span class="cmt">// slot 6</span>
+
+    <span class="cmt">// Struct — fields packed in declaration order</span>
+    <span class="kw">struct</span> Proposal {
+        <span class="typ">address</span> proposer;   <span class="cmt">// 20 bytes</span>
+        <span class="typ">uint64</span>  deadline;   <span class="cmt">// 8 bytes  ← fits in same slot as address!</span>
+        <span class="typ">uint32</span>  voteCount;  <span class="cmt">// 4 bytes  ← still in same slot</span>
+        <span class="typ">bool</span>    executed;   <span class="cmt">// 1 byte   ← still in same slot (32 bytes total)</span>
+        <span class="typ">string</span>  description; <span class="cmt">// new slot (dynamic)</span>
+    }
+    Proposal[] <span class="kw">public</span> proposals; <span class="cmt">// dynamic array — length at slot 7, elements at keccak(7)</span>
+}</div>
+<p class="lbl">Memory, storage, and calldata — the three data locations</p>
+<div class="g3">
+  <div class="card ac"><span class="badge ba" style="margin-bottom:8px">storage</span><p class="ct">On-chain, persistent</p><p class="cb">State variables live here. Costs 20,000 gas to write a new slot (SSTORE). Most expensive. Persists between transactions.</p><div class="code" style="margin-top:8px;font-size:11px">uint256 <span class="kw">public</span> counter; <span class="cmt">// storage</span>
+counter++; <span class="cmt">// 5,000 gas (update)</span></div></div>
+  <div class="card"><span class="badge bg" style="margin-bottom:8px">memory</span><p class="ct">Ephemeral, per-call</p><p class="cb">Temporary variables inside a function. Erased after the call. Much cheaper than storage. Required keyword for arrays and strings in functions.</p><div class="code" style="margin-top:8px;font-size:11px"><span class="kw">function</span> foo(<span class="typ">string</span> <span class="kw">memory</span> name) {
+  <span class="typ">uint256</span>[] <span class="kw">memory</span> arr = <span class="kw">new</span> <span class="typ">uint256</span>[](<span class="num">5</span>);
+}</div></div>
+  <div class="card"><span class="badge bw" style="margin-bottom:8px">calldata</span><p class="ct">Read-only input data</p><p class="cb">Function arguments from external callers. Cheapest — never copied. Use for external functions receiving arrays or strings. Cannot be modified.</p><div class="code" style="margin-top:8px;font-size:11px"><span class="kw">function</span> bar(
+  <span class="typ">uint256</span>[] <span class="kw">calldata</span> ids <span class="cmt">// cheapest!</span>
+) <span class="kw">external</span> { ... }</div></div>
+</div>
+<button onclick="sendPrompt('Explain Solidity storage collision in upgradeable proxy contracts and how EIP-1967 storage slots prevent it — with a code example')">Storage collisions in upgradeable proxies ↗</button>
+</div>
+
+<!-- S3: SOLIDITY FUNCTIONS AND OOP -->
+<div class="gsec" id="s3" data-label="Solidity: functions">
+<p class="lbl">Solidity — functions, events, and OOP</p>
+<h3 class="sec-t">Functions, modifiers, inheritance</h3>
+<p class="sec-s">Solidity combines familiar OOP patterns with blockchain-specific constructs — events for cheap logging, modifiers for reusable guards, and interfaces for protocol composability.</p>
+<p class="lbl">Function anatomy</p>
+<div class="code"><span class="kw">contract</span> FunctionGuide {
+    <span class="typ">uint256</span> <span class="kw">private</span> _balance;
+    <span class="typ">address</span> <span class="kw">public</span>  owner;
+
+    <span class="cmt">// ── Custom errors (EIP-838) — 4x cheaper than require("string") ──</span>
+    <span class="kw">error</span> Unauthorized(<span class="typ">address</span> caller);
+    <span class="kw">error</span> InsufficientBalance(<span class="typ">uint256</span> requested, <span class="typ">uint256</span> available);
+
+    <span class="cmt">// ── Events — stored in tx receipt logs (not state), very cheap ──</span>
+    <span class="kw">event</span> Deposited(<span class="typ">address</span> <span class="kw">indexed</span> sender, <span class="typ">uint256</span> amount);   <span class="cmt">// indexed = filterable</span>
+    <span class="kw">event</span> Withdrawn(<span class="typ">address</span> <span class="kw">indexed</span> to, <span class="typ">uint256</span> amount);
+
+    <span class="cmt">// ── Modifier — reusable guard, inserted at the _; position ──</span>
+    <span class="kw">modifier</span> onlyOwner() {
+        <span class="kw">if</span> (msg.sender != owner) <span class="kw">revert</span> Unauthorized(msg.sender);
+        _; <span class="cmt">// function body executes here</span>
+    }
+
+    <span class="cmt">// pure: reads no state, writes no state — cheapest to call</span>
+    <span class="kw">function</span> mul(<span class="typ">uint256</span> a, <span class="typ">uint256</span> b) <span class="kw">public pure</span> <span class="kw">returns</span> (<span class="typ">uint256</span>) {
+        <span class="kw">return</span> a * b;
+    }
+
+    <span class="cmt">// view: reads state, writes nothing — free to call externally</span>
+    <span class="kw">function</span> getBalance() <span class="kw">external view</span> <span class="kw">returns</span> (<span class="typ">uint256</span>) {
+        <span class="kw">return</span> _balance;
+    }
+
+    <span class="cmt">// payable: function can receive ETH (msg.value > 0)</span>
+    <span class="kw">function</span> deposit() <span class="kw">external payable</span> {
+        <span class="kw">require</span>(msg.value > <span class="num">0</span>, <span class="str">"No ETH sent"</span>);
+        _balance += msg.value;
+        <span class="kw">emit</span> Deposited(msg.sender, msg.value);
+    }
+
+    <span class="cmt">// State-changing + access controlled — costs gas to call</span>
+    <span class="kw">function</span> withdraw(<span class="typ">uint256</span> amount) <span class="kw">external</span> onlyOwner {
+        <span class="kw">if</span> (amount > _balance) <span class="kw">revert</span> InsufficientBalance(amount, _balance);
+        _balance -= amount;
+        (bool ok,) = msg.sender.call{value: amount}(<span class="str">""</span>);
+        <span class="kw">require</span>(ok, <span class="str">"Transfer failed"</span>);
+        <span class="kw">emit</span> Withdrawn(msg.sender, amount);
+    }
+}</div>
+<p class="lbl">Interfaces, inheritance, and libraries</p>
+<div class="code"><span class="cmt">// Interface: defines the ABI contract any implementation must satisfy</span>
+<span class="kw">interface</span> IERC20 {
+    <span class="kw">function</span> transfer(<span class="typ">address</span> to, <span class="typ">uint256</span> amount) <span class="kw">external returns</span> (<span class="typ">bool</span>);
+    <span class="kw">function</span> balanceOf(<span class="typ">address</span> account) <span class="kw">external view returns</span> (<span class="typ">uint256</span>);
+    <span class="kw">event</span> Transfer(<span class="typ">address</span> <span class="kw">indexed</span> from, <span class="typ">address</span> <span class="kw">indexed</span> to, <span class="typ">uint256</span> value);
+}
+
+<span class="cmt">// Abstract base contract with shared logic</span>
+<span class="kw">abstract contract</span> Ownable {
+    <span class="typ">address</span> <span class="kw">public</span> owner;
+    <span class="kw">error</span> NotOwner();
+    <span class="kw">constructor</span>() { owner = msg.sender; }
+    <span class="kw">modifier</span> onlyOwner() { <span class="kw">if</span>(msg.sender!=owner) <span class="kw">revert</span> NotOwner(); _; }
+}
+
+<span class="cmt">// Library: stateless reusable code, called with delegatecall or linked</span>
+<span class="kw">library</span> MathLib {
+    <span class="kw">function</span> sqrt(<span class="typ">uint256</span> y) <span class="kw">internal pure returns</span> (<span class="typ">uint256</span> z) {
+        <span class="kw">if</span> (y > <span class="num">3</span>) {
+            z = y;
+            <span class="typ">uint256</span> x = y / <span class="num">2</span> + <span class="num">1</span>;
+            <span class="kw">while</span> (x < z) { z = x; x = (y / x + x) / <span class="num">2</span>; }
+        } <span class="kw">else if</span> (y != <span class="num">0</span>) { z = <span class="num">1</span>; }
+    }
+}
+
+<span class="cmt">// Concrete implementation inheriting from two bases</span>
+<span class="kw">contract</span> MyToken <span class="kw">is</span> IERC20, Ownable {
+    <span class="kw">using</span> MathLib <span class="kw">for</span> <span class="typ">uint256</span>; <span class="cmt">// attach library to uint256 type</span>
+    mapping(<span class="typ">address</span> => <span class="typ">uint256</span>) <span class="kw">private</span> _bal;
+
+    <span class="kw">function</span> transfer(<span class="typ">address</span> to, <span class="typ">uint256</span> amount) <span class="kw">external override returns</span> (<span class="typ">bool</span>) {
+        _bal[msg.sender] -= amount;
+        _bal[to] += amount;
+        <span class="kw">emit</span> Transfer(msg.sender, to, amount);
+        <span class="kw">return true</span>;
+    }
+
+    <span class="kw">function</span> balanceOf(<span class="typ">address</span> a) <span class="kw">external view override returns</span> (<span class="typ">uint256</span>) {
+        <span class="kw">return</span> _bal[a];
+    }
+
+    <span class="kw">function</span> sqrtOfBalance(<span class="typ">address</span> a) <span class="kw">external view returns</span> (<span class="typ">uint256</span>) {
+        <span class="kw">return</span> _bal[a].sqrt(); <span class="cmt">// library called on uint256 value</span>
+    }
+}</div>
+<button onclick="sendPrompt('Show me how to implement a UUPS upgradeable proxy contract in Solidity using OpenZeppelin — explain the storage layout and delegatecall mechanism')">How do UUPS upgradeable proxies work? ↗</button>
+</div>
+
+<!-- S4: SOLIDITY SECURITY -->
+<div class="gsec" id="s4" data-label="Solidity: security">
+<p class="lbl">Solidity — security patterns and common exploits</p>
+<h3 class="sec-t">Security — the most critical skill</h3>
+<p class="sec-s">Smart contracts hold real value and are immutable once deployed. One bug can drain millions. These are the most important attack vectors every Solidity developer must understand and prevent.</p>
+<p class="lbl">1. Reentrancy — the $60M DAO hack pattern</p>
+<div class="col2">
+  <div>
+    <div class="note"><i class="ti ti-bug" aria-hidden="true" style="font-size:14px;margin-right:4px"></i>Vulnerable — state updated after external call</div>
+    <div class="code"><span class="kw">contract</span> Vulnerable {
+  mapping(<span class="typ">address</span>=><span class="typ">uint</span>) <span class="kw">public</span> bal;
+
+  <span class="kw">function</span> withdraw() <span class="kw">external</span> {
+    <span class="typ">uint</span> amt = bal[msg.sender];
+    <span class="err">// ❌ External call BEFORE state update</span>
+    (bool ok,) = msg.sender.call{
+      value: amt
+    }(<span class="str">""</span>);
+    <span class="kw">require</span>(ok);
+    <span class="err">// ❌ Attacker re-enters above line</span>
+    <span class="err">// before this runs:</span>
+    bal[msg.sender] = <span class="num">0</span>;
+  }
+}</span></div>
+  </div>
+  <div>
+    <div class="good"><i class="ti ti-shield-check" aria-hidden="true" style="font-size:14px;margin-right:4px"></i>Secure — Checks-Effects-Interactions (CEI)</div>
+    <div class="code"><span class="kw">contract</span> Secure {
+  mapping(<span class="typ">address</span>=><span class="typ">uint</span>) <span class="kw">public</span> bal;
+  <span class="kw">bool private</span> _locked;
+
+  <span class="kw">modifier</span> noReentry() {
+    <span class="kw">require</span>(!_locked, <span class="str">"reentrant"</span>);
+    _locked = <span class="kw">true</span>;
+    _;
+    _locked = <span class="kw">false</span>;
+  }
+
+  <span class="kw">function</span> withdraw() <span class="kw">external</span> noReentry {
+    <span class="typ">uint</span> amt = bal[msg.sender]; <span class="ok">// 1. CHECK</span>
+    bal[msg.sender] = <span class="num">0</span>;        <span class="ok">// 2. EFFECT</span>
+    (bool ok,) = msg.sender     <span class="ok">// 3. INTERACT</span>
+      .call{value:amt}(<span class="str">""</span>);
+    <span class="kw">require</span>(ok);
+  }
+}</div>
+  </div>
+</div>
+<p class="lbl">2. tx.origin vs msg.sender — phishing attack vector</p>
+<div class="col2">
+  <div>
+    <div class="note"><i class="ti ti-alert-triangle" aria-hidden="true" style="font-size:14px;margin-right:4px"></i>Never use tx.origin for auth</div>
+    <div class="code"><span class="kw">contract</span> PhishableWallet {
+  <span class="typ">address</span> <span class="kw">public</span> owner;
+
+  <span class="kw">function</span> transfer(<span class="typ">address</span> to, <span class="typ">uint</span> amt)
+      <span class="kw">external</span> {
+    <span class="err">// ❌ tx.origin = original EOA signer</span>
+    <span class="err">// Attacker contract tricks owner into</span>
+    <span class="err">// calling it — tx.origin is still owner!</span>
+    <span class="kw">require</span>(tx.origin == owner);
+    payable(to).transfer(amt);
+  }
+}</div>
+  </div>
+  <div>
+    <div class="good"><i class="ti ti-shield-check" aria-hidden="true" style="font-size:14px;margin-right:4px"></i>Always use msg.sender</div>
+    <div class="code"><span class="kw">contract</span> SafeWallet {
+  <span class="typ">address</span> <span class="kw">public</span> owner;
+
+  <span class="kw">function</span> transfer(<span class="typ">address</span> to, <span class="typ">uint</span> amt)
+      <span class="kw">external</span> {
+    <span class="ok">// ✅ msg.sender = direct caller</span>
+    <span class="ok">// Attacker contract's address, not owner's</span>
+    <span class="ok">// So require() fails for attacker</span>
+    <span class="kw">require</span>(msg.sender == owner,
+      <span class="str">"not owner"</span>);
+    payable(to).transfer(amt);
+  }
+}</div>
+  </div>
+</div>
+<p class="lbl">3. Other critical vulnerability checklist</p>
+<div class="g2">
+  <div class="card dc"><span class="badge bd" style="margin-bottom:8px">Integer overflow (pre-0.8)</span><p class="ct">Now auto-checked in 0.8+</p><p class="cb">Before Solidity 0.8, <span class="inline-badge">uint8(255) + 1 == 0</span>. Post-0.8 it reverts. For older contracts, use OpenZeppelin SafeMath. For unchecked math gas optimization, use <span class="inline-badge">unchecked { }</span> block consciously.</p></div>
+  <div class="card dc"><span class="badge bd" style="margin-bottom:8px">Oracle manipulation</span><p class="ct">Never use spot price as oracle</p><p class="cb">Reading <span class="inline-badge">pool.getReserves()</span> inline is manipulable via flash loans in the same transaction. Use Chainlink price feeds or TWAP (time-weighted average price) from Uniswap v3 for any price-sensitive logic.</p></div>
+  <div class="card wc"><span class="badge bw" style="margin-bottom:8px">Access control</span><p class="ct">Role-based access matters</p><p class="cb">Use OpenZeppelin <span class="inline-badge">Ownable</span> for single-admin, <span class="inline-badge">AccessControl</span> for multi-role. Never leave <span class="inline-badge">initialize()</span> unguarded on upgradeable contracts — set roles in the constructor or with initializer protection.</p></div>
+  <div class="card wc"><span class="badge bw" style="margin-bottom:8px">Front-running (MEV)</span><p class="ct">Tx ordering is public</p><p class="cb">Mempool transactions are visible before inclusion. Commit-reveal schemes protect sensitive actions. Slippage parameters in DEX trades protect against sandwich attacks. Consider using private RPC endpoints (Flashbots Protect) for sensitive txs.</p></div>
+</div>
+<button onclick="sendPrompt('Walk me through a real flash loan attack step by step — how did the bZx protocol attack of 2020 work, and what Solidity patterns would have prevented it?')">Anatomy of a flash loan attack ↗</button>
+</div>
+
+<!-- S5: RUST FUNDAMENTALS -->
+<div class="gsec" id="s5" data-label="Rust: fundamentals">
+<p class="lbl">Rust — core language concepts for blockchain devs</p>
+<h3 class="sec-t">Ownership, errors, and traits</h3>
+<p class="sec-s">Rust's ownership system is its defining feature — a compile-time memory model that eliminates entire classes of bugs with zero runtime overhead. Understanding it is the key to writing safe, fast Solana programs.</p>
+<p class="lbl">Ownership and borrowing</p>
+<div class="code"><span class="cmt">// RULE 1: each value has exactly one owner at a time</span>
+<span class="kw">let</span> s1 = String::from(<span class="str">"hello"</span>); <span class="cmt">// s1 owns the String</span>
+<span class="kw">let</span> s2 = s1;                    <span class="cmt">// ownership MOVES to s2</span>
+<span class="err">// println!("{}", s1);          // ❌ compile error: s1 is moved (dropped)</span>
+println!(<span class="str">"{}"</span>, s2);            <span class="ok">// ✅ s2 is the owner now</span>
+
+<span class="cmt">// RULE 2: borrowing — reference without taking ownership (&T)</span>
+<span class="kw">fn</span> get_len(s: &<span class="typ">String</span>) -> <span class="typ">usize</span> { s.len() } <span class="cmt">// borrows, doesn't own</span>
+<span class="kw">let</span> s3 = String::from(<span class="str">"world"</span>);
+<span class="kw">let</span> len = get_len(&s3);         <span class="cmt">// pass reference: s3 still valid after call</span>
+
+<span class="cmt">// RULE 3: mutable borrow — only ONE &mut ref at a time (prevents data races)</span>
+<span class="kw">let mut</span> s4 = String::from(<span class="str">"hello"</span>);
+<span class="kw">let</span> r1 = &<span class="kw">mut</span> s4;
+<span class="err">// let r2 = &mut s4;  // ❌ compile error: two mutable borrows</span>
+r1.push_str(<span class="str">" world"</span>);         <span class="ok">// ✅ only r1 holds the mutable borrow</span>
+
+<span class="cmt">// Clone: deep copy when you actually need two owners (expensive)</span>
+<span class="kw">let</span> s5 = String::from(<span class="str">"data"</span>);
+<span class="kw">let</span> s6 = s5.clone();            <span class="cmt">// explicit heap copy — both s5 and s6 valid</span>
+
+<span class="cmt">// Copy types (stack-only): integers, bool, char — always copied, not moved</span>
+<span class="kw">let</span> x: <span class="typ">u64</span> = <span class="num">42</span>;
+<span class="kw">let</span> y = x; <span class="cmt">// x is still valid — integers implement Copy trait</span></div>
+<p class="lbl">Result and error handling — no exceptions in Rust</p>
+<div class="code"><span class="kw">use</span> std::num::ParseIntError;
+
+<span class="cmt">// Result&lt;T, E&gt; — either Ok(value) or Err(reason). Must be handled explicitly.</span>
+<span class="kw">fn</span> parse_amount(s: &<span class="typ">str</span>) -> <span class="typ">Result</span>&lt;<span class="typ">u64</span>, ParseIntError&gt; {
+    s.trim().parse::&lt;<span class="typ">u64</span>&gt;() <span class="cmt">// returns Result — propagate or handle</span>
+}
+
+<span class="cmt">// ? operator: returns Err early if the value is Err (like try/catch but at compile time)</span>
+<span class="kw">fn</span> process(input: &<span class="typ">str</span>) -> <span class="typ">Result</span>&lt;<span class="typ">u64</span>, ParseIntError&gt; {
+    <span class="kw">let</span> amount = parse_amount(input)?; <span class="cmt">// if Err, returns early with Err</span>
+    Ok(amount * <span class="num">2</span>)
+}
+
+<span class="cmt">// Pattern matching — exhaustive, compiler enforces all cases are handled</span>
+<span class="kw">match</span> process(<span class="str">"100"</span>) {
+    Ok(v)  => println!(<span class="str">"Got: {}"</span>, v),  <span class="ok">// ✅ success case</span>
+    Err(e) => println!(<span class="str">"Error: {}"</span>, e), <span class="err">// ❌ error case — must handle!</span>
+}
+
+<span class="cmt">// Custom error enum — best practice for blockchain programs</span>
+<span class="kw">use</span> thiserror::Error;
+
+<span class="mac">#[derive(Debug, Error)]</span>
+<span class="kw">pub enum</span> VaultError {
+    <span class="mac">#[error("insufficient balance: need {needed}, have {available}")]</span>
+    InsufficientBalance { needed: <span class="typ">u64</span>, available: <span class="typ">u64</span> },
+    <span class="mac">#[error("unauthorized signer")]</span>
+    Unauthorized,
+    <span class="mac">#[error("amount must be greater than zero")]</span>
+    ZeroAmount,
+}</div>
+<p class="lbl">Traits — Rust's interface system</p>
+<div class="code"><span class="cmt">// Trait = interface contract. Structs implement traits.</span>
+<span class="kw">pub trait</span> Validate {
+    <span class="kw">fn</span> validate(&self) -> <span class="typ">Result</span>&lt;(), VaultError&gt;;
+    <span class="kw">fn</span> description(&self) -> &<span class="typ">str</span> { <span class="str">"generic item"</span> } <span class="cmt">// default impl</span>
+}
+
+<span class="kw">pub struct</span> Transfer { <span class="kw">pub</span> amount: <span class="typ">u64</span>, <span class="kw">pub</span> recipient: <span class="typ">String</span> }
+
+<span class="kw">impl</span> Validate <span class="kw">for</span> Transfer {
+    <span class="kw">fn</span> validate(&self) -> <span class="typ">Result</span>&lt;(), VaultError&gt; {
+        <span class="kw">if</span> self.amount == <span class="num">0</span> { <span class="kw">return</span> Err(VaultError::ZeroAmount); }
+        Ok(())
+    }
+    <span class="kw">fn</span> description(&self) -> &<span class="typ">str</span> { <span class="str">"token transfer"</span> }
+}
+
+<span class="cmt">// Trait bound: accept any type that implements Validate</span>
+<span class="kw">fn</span> execute&lt;T: Validate&gt;(item: &T) -> <span class="typ">Result</span>&lt;(), VaultError&gt; {
+    item.validate()?;
+    println!(<span class="str">"Executing: {}"</span>, item.description());
+    Ok(())
+}
+
+<span class="cmt">// Common derived traits — added automatically via #[derive]</span>
+<span class="mac">#[derive(Debug, Clone, PartialEq, Eq, Hash)]</span>
+<span class="kw">pub struct</span> Pubkey([<span class="typ">u8</span>; <span class="num">32</span>]); <span class="cmt">// Debug=printable, Clone=copyable, PartialEq=comparable</span></div>
+<button onclick="sendPrompt('Explain Rust lifetimes and how they relate to writing safe Solana programs — when do you actually need explicit lifetime annotations in Anchor code?')">When do Rust lifetimes matter in Solana? ↗</button>
+</div>
+
+<!-- S6: RUST + SOLANA/ANCHOR -->
+<div class="gsec" id="s6" data-label="Rust and Solana">
+<p class="lbl">Rust — Solana and the Anchor framework</p>
+<h3 class="sec-t">Solana programs with Anchor</h3>
+<p class="sec-s">Solana's account model is fundamentally different from the EVM. Programs are stateless — all data lives in separate "accounts" that programs read and write. Anchor generates the boilerplate and validates accounts at the instruction boundary.</p>
+<p class="lbl">EVM vs Solana account model</p>
+<div class="cmp" style="grid-template-columns:1fr 1fr">
+  <div class="cc0"><div class="ch">Concept</div><div class="cr">State storage</div><div class="cr">Program (contract)</div><div class="cr">Address type</div><div class="cr">Native token</div><div class="cr">Execution model</div><div class="cr">Fees</div></div>
+  <div class="cc" style="border-left:2px solid var(--border-accent)"><div class="ch" style="color:var(--text-accent)">EVM (Solidity)</div><div class="cr">Inside the contract at storage slots</div><div class="cr">Stateful — holds code and state</div><div class="cr">20-byte hex (0xAbCd…)</div><div class="cr">ETH (18 decimals)</div><div class="cr">Single-threaded per block</div><div class="cr">Gas × gas price</div></div>
+  <div class="cc" style="border-left:2px solid var(--border-pro)"><div class="ch" style="color:var(--text-pro)">Solana (Rust)</div><div class="cr">Separate "data accounts" owned by the program</div><div class="cr">Stateless — code only, no built-in storage</div><div class="cr">32-byte base58 (Abc1…)</div><div class="cr">SOL (9 decimals = lamports)</div><div class="cr">Parallel (Sealevel runtime)</div><div class="cr">Fixed per signature + compute units</div></div>
+</div>
+<p class="lbl">Program Derived Addresses (PDAs)</p>
+<div class="code"><span class="cmt">// PDAs: deterministic addresses with no private key — owned by programs
+// Derived from: seeds + program_id → find_program_address → (pubkey, bump)
+// The bump ensures the resulting point is off the ed25519 curve (no private key)</span>
+
+<span class="cmt">// Client-side (TypeScript) — derive the PDA</span>
+<span class="kw">const</span> [vaultPDA, bump] = PublicKey.findProgramAddressSync(
+  [Buffer.from(<span class="str">"vault"</span>), owner.publicKey.toBuffer()],
+  program.programId
+);
+
+<span class="cmt">// On-chain (Rust/Anchor) — verify PDA in account constraints</span>
+<span class="mac">#[derive(Accounts)]</span>
+<span class="kw">pub struct</span> Initialize&lt;<span class="str">'info</span>&gt; {
+    <span class="mac">#[account(
+        init,                                      // create this account
+        payer = owner,                             // owner pays rent-exemption
+        space = 8 + Vault::INIT_SPACE,             // discriminator + struct size
+        seeds = [b"vault", owner.key().as_ref()],  // PDA derivation seeds
+        bump                                       // stores canonical bump
+    )]</span>
+    <span class="kw">pub</span> vault: Account&lt;<span class="str">'info</span>, Vault&gt;,
+
+    <span class="mac">#[account(mut)]</span>
+    <span class="kw">pub</span> owner: Signer&lt;<span class="str">'info</span>&gt;,  <span class="cmt">// must sign the transaction</span>
+
+    <span class="kw">pub</span> system_program: Program&lt;<span class="str">'info</span>, System&gt;,
+}</div>
+<p class="lbl">A complete Anchor program</p>
+<div class="code"><span class="kw">use</span> anchor_lang::prelude::*;
+
+declare_id!(<span class="str">"Vault111111111111111111111111111111111111111"</span>);
+
+<span class="mac">#[program]</span>
+<span class="kw">pub mod</span> token_vault {
+    <span class="kw">use super</span>::*;
+
+    <span class="kw">pub fn</span> initialize(ctx: Context&lt;Initialize&gt;) -> Result&lt;()&gt; {
+        <span class="kw">let</span> vault = &<span class="kw">mut</span> ctx.accounts.vault;
+        vault.owner = ctx.accounts.owner.key();
+        vault.balance = <span class="num">0</span>;
+        vault.bump = ctx.bumps.vault; <span class="cmt">// store bump for future PDA signing</span>
+        Ok(())
+    }
+
+    <span class="kw">pub fn</span> deposit(ctx: Context&lt;Deposit&gt;, amount: <span class="typ">u64</span>) -> Result&lt;()&gt; {
+        require!(amount > <span class="num">0</span>, VaultError::ZeroAmount);
+
+        <span class="cmt">// CPI: cross-program invocation — call the System program to transfer SOL</span>
+        <span class="kw">let</span> cpi_ctx = CpiContext::new(
+            ctx.accounts.system_program.to_account_info(),
+            system_program::Transfer {
+                from: ctx.accounts.owner.to_account_info(),
+                to:   ctx.accounts.vault.to_account_info(),
+            },
+        );
+        system_program::transfer(cpi_ctx, amount)?;
+
+        ctx.accounts.vault.balance += amount;
+        emit!(DepositEvent { owner: ctx.accounts.owner.key(), amount });
+        Ok(())
+    }
+
+    <span class="kw">pub fn</span> withdraw(ctx: Context&lt;Withdraw&gt;, amount: <span class="typ">u64</span>) -> Result&lt;()&gt; {
+        <span class="kw">let</span> vault = &<span class="kw">mut</span> ctx.accounts.vault;
+        require!(amount <= vault.balance, VaultError::InsufficientBalance);
+
+        <span class="cmt">// PDA-signed CPI: vault PDA signs as the source</span>
+        <span class="kw">let</span> seeds = &[b<span class="str">"vault"</span>, vault.owner.as_ref(), &[vault.bump]];
+        <span class="kw">let</span> signer = &[&seeds[..]];
+        <span class="kw">let</span> cpi_ctx = CpiContext::new_with_signer(
+            ctx.accounts.system_program.to_account_info(),
+            system_program::Transfer {
+                from: ctx.accounts.vault.to_account_info(),
+                to:   ctx.accounts.owner.to_account_info(),
+            },
+            signer,
+        );
+        system_program::transfer(cpi_ctx, amount)?;
+        vault.balance -= amount;
+        Ok(())
+    }
+}
+
+<span class="mac">#[account]
+#[derive(InitSpace)]</span>
+<span class="kw">pub struct</span> Vault {
+    <span class="kw">pub</span> owner:   Pubkey, <span class="cmt">// 32 bytes</span>
+    <span class="kw">pub</span> balance: <span class="typ">u64</span>,    <span class="cmt">// 8 bytes</span>
+    <span class="kw">pub</span> bump:    <span class="typ">u8</span>,     <span class="cmt">// 1 byte</span>
+}
+
+<span class="mac">#[event]</span>
+<span class="kw">pub struct</span> DepositEvent { <span class="kw">pub</span> owner: Pubkey, <span class="kw">pub</span> amount: <span class="typ">u64</span> }
+
+<span class="mac">#[error_code]</span>
+<span class="kw">pub enum</span> VaultError {
+    <span class="mac">#[msg("Amount must be greater than zero")]</span>
+    ZeroAmount,
+    <span class="mac">#[msg("Insufficient vault balance")]</span>
+    InsufficientBalance,
+}</div>
+<button onclick="sendPrompt('Explain Solana account rent-exemption, how compute unit budgets work, and what the Sealevel parallel runtime does differently from the EVM')">Solana runtime: rent, compute units, Sealevel ↗</button>
+</div>
+
+<!-- S7: USE CASES -->
+<div class="gsec" id="s7" data-label="Use cases">
+<p class="lbl">Ultimate use cases — what to build with each</p>
+<h3 class="sec-t">What to build and where</h3>
+<p class="sec-s">The right language depends on your target chain, performance needs, and the existing ecosystem you want to compose with. Here's the definitive breakdown by project type.</p>
+<div class="g2">
+  <div class="card ac">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:36px;height:36px;border-radius:50%;background:var(--bg-accent);display:flex;align-items:center;justify-content:center"><i class="ti ti-arrows-exchange" aria-hidden="true" style="font-size:16px;color:var(--text-accent)"></i></div><p class="ct" style="margin:0">DeFi protocols</p></div>
+    <div style="display:flex;gap:6px;margin-bottom:8px"><span class="badge ba">Solidity on EVM</span><span class="badge bp">Rust on Solana</span></div>
+    <p class="cb">AMM/DEXs: Uniswap (Solidity) or Orca/Raydium (Rust). Lending: Aave (Solidity) or Kamino (Rust). Derivatives: dYdX v3 (Solidity) or dYdX v4 (Rust/Cosmos). Stablecoins: MakerDAO (Solidity). For maximum composability with existing DeFi money legos → Solidity. For sub-second settlement and sub-cent fees → Rust/Solana.</p>
+  </div>
+  <div class="card pc">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:36px;height:36px;border-radius:50%;background:var(--bg-pro);display:flex;align-items:center;justify-content:center"><i class="ti ti-certificate" aria-hidden="true" style="font-size:16px;color:var(--text-pro)"></i></div><p class="ct" style="margin:0">NFT contracts and marketplaces</p></div>
+    <div style="display:flex;gap:6px;margin-bottom:8px"><span class="badge ba">Primarily Solidity</span><span class="badge bp">Metaplex on Solana</span></div>
+    <p class="cb">EVM: ERC-721 / ERC-1155 contracts with OpenZeppelin. Royalties via ERC-2981. Marketplace logic in separate contracts. Solana: Metaplex Token Metadata program (Rust) handles NFT standard. Compressed NFTs (cNFTs) via Merkle tree — mint 1M NFTs for $5 using Metaplex Bubblegum. Massive cost advantage for high-volume collections.</p>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:36px;height:36px;border-radius:50%;background:var(--bg-warning);display:flex;align-items:center;justify-content:center"><i class="ti ti-device-gamepad-2" aria-hidden="true" style="font-size:16px;color:var(--text-warning)"></i></div><p class="ct" style="margin:0">Blockchain gaming and DePIN</p></div>
+    <div style="display:flex;gap:6px;margin-bottom:8px"><span class="badge bp">Rust strongly preferred</span></div>
+    <p class="cb">Games need high throughput and near-zero fees per transaction. Solana's parallel execution (Sealevel) handles thousands of game-state updates per second. DePIN (Decentralized Physical Infrastructure) projects like Helium and Hivemapper run on Solana for the same reasons. Use ERC-1155 on EVM only for slow-paced gaming or collectibles.</p>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:36px;height:36px;border-radius:50%;background:var(--bg-success);display:flex;align-items:center;justify-content:center"><i class="ti ti-users-group" aria-hidden="true" style="font-size:16px;color:var(--text-success)"></i></div><p class="ct" style="margin:0">DAOs and governance</p></div>
+    <div style="display:flex;gap:6px;margin-bottom:8px"><span class="badge ba">Solidity dominant</span></div>
+    <p class="cb">OpenZeppelin Governor (Solidity) is the standard for on-chain governance. Compound Governor Bravo, Uniswap DAO, and most major DAOs run on Ethereum. Solana-based DAOs use Realms (Rust) with SPL Governance. For maximum composability with existing DeFi treasury assets → Solidity/Ethereum.</p>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:36px;height:36px;border-radius:50%;background:var(--bg-accent);display:flex;align-items:center;justify-content:center"><i class="ti ti-arrows-left-right" aria-hidden="true" style="font-size:16px;color:var(--text-accent)"></i></div><p class="ct" style="margin:0">Cross-chain bridges and oracles</p></div>
+    <div style="display:flex;gap:6px;margin-bottom:8px"><span class="badge ba">Solidity</span><span class="badge bp">Rust</span></div>
+    <p class="cb">Bridges need contracts on every chain they connect. LayerZero endpoints are Solidity (EVM) + Rust (Solana). Wormhole uses Rust for its guardian network and has adapters for both. Chainlink oracle nodes use off-chain Rust/Go code and on-chain Solidity aggregator contracts. Both languages required for full-stack cross-chain work.</p>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:36px;height:36px;border-radius:50%;background:var(--bg-pro);display:flex;align-items:center;justify-content:center"><i class="ti ti-cpu" aria-hidden="true" style="font-size:16px;color:var(--text-pro)"></i></div><p class="ct" style="margin:0">Chain infrastructure and runtimes</p></div>
+    <div style="display:flex;gap:6px;margin-bottom:8px"><span class="badge bp">Rust exclusively</span></div>
+    <p class="cb">Solana's validator software, Substrate (Polkadot), Lighthouse (Ethereum consensus client), Reth (Ethereum execution client), and most L2 sequencer code are all written in Rust. If you want to build or customize a blockchain itself — consensus, p2p networking, state machine — Rust is the uncontested choice.</p>
+  </div>
+</div>
+<div class="div"></div>
+<p class="lbl">Key tooling per stack</p>
+<div class="col2">
+  <div>
+    <p style="font-size:12px;font-weight:500;color:var(--text-accent);margin:0 0 8px">Solidity toolchain</p>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="card" style="padding:.6rem 1rem"><p class="ct" style="font-size:12px;margin-bottom:2px">Foundry</p><p class="cb" style="font-size:12px">Fast Rust-native test framework. Fuzz testing, invariant testing, fork testing. Industry-preferred.</p></div>
+      <div class="card" style="padding:.6rem 1rem"><p class="ct" style="font-size:12px;margin-bottom:2px">Hardhat</p><p class="cb" style="font-size:12px">JS/TS ecosystem. Rich plugin system. Easier for full-stack dApp teams.</p></div>
+      <div class="card" style="padding:.6rem 1rem"><p class="ct" style="font-size:12px;margin-bottom:2px">OpenZeppelin Contracts</p><p class="cb" style="font-size:12px">Audited ERC standards, access control, upgradeable proxies, Governor.</p></div>
+      <div class="card" style="padding:.6rem 1rem"><p class="ct" style="font-size:12px;margin-bottom:2px">Slither / Mythril</p><p class="cb" style="font-size:12px">Static analysis tools. Run before every audit. Catch reentrancy, access control, and integer issues.</p></div>
+    </div>
+  </div>
+  <div>
+    <p style="font-size:12px;font-weight:500;color:var(--text-pro);margin:0 0 8px">Rust / Solana toolchain</p>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="card" style="padding:.6rem 1rem"><p class="ct" style="font-size:12px;margin-bottom:2px">Anchor Framework</p><p class="cb" style="font-size:12px">Eliminates 80% of Solana boilerplate. Account validation macros, IDL generation, TS client.</p></div>
+      <div class="card" style="padding:.6rem 1rem"><p class="ct" style="font-size:12px;margin-bottom:2px">solana-program-test</p><p class="cb" style="font-size:12px">Full runtime simulator for unit testing programs without deploying to devnet.</p></div>
+      <div class="card" style="padding:.6rem 1rem"><p class="ct" style="font-size:12px;margin-bottom:2px">Metaplex + SPL libs</p><p class="cb" style="font-size:12px">Token program, associated token accounts, NFT metadata standard, compression trees.</p></div>
+      <div class="card" style="padding:.6rem 1rem"><p class="ct" style="font-size:12px;margin-bottom:2px">Soteria / Sec3</p><p class="cb" style="font-size:12px">Static analyzers for Solana programs. Detect signer validation bugs, arithmetic overflow, missing checks.</p></div>
+    </div>
+  </div>
+</div>
+<button onclick="sendPrompt('Give me a full project structure and learning roadmap for becoming a professional Solidity smart contract developer — what to build, which audits to study, and how to get hired')">Solidity developer roadmap ↗</button>
+<button onclick="sendPrompt('Give me a full learning roadmap to become a professional Solana program developer in Rust — prerequisites, resources, projects to build, and how to break into the ecosystem')" style="margin-left:8px">Rust/Solana developer roadmap ↗</button>
+</div>
+</div>
+<script>
+(function(){
+  var nav=document.getElementById('gnav');
+  var secs=document.querySelectorAll('.gsec');
+  function show(id){
+    secs.forEach(function(s){s.style.display='none';});
+    document.getElementById(id).style.display='block';
+    nav.querySelectorAll('.gtab').forEach(function(b){b.classList.remove('active');});
+    nav.querySelector('[data-t="'+id+'"]').classList.add('active');
+  }
+  secs.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.className='gtab'+(i===0?' active':'');
+    b.dataset.t=s.id;
+    b.textContent=s.dataset.label;
+    b.onclick=function(){show(s.id);};
+    nav.appendChild(b);
+    if(i>0)s.style.display='none';
+  });
+  nav.style.display='flex';
+})();
+</script>

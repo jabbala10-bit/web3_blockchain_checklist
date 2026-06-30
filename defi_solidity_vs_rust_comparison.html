@@ -1,0 +1,704 @@
+
+<h2 class="sr-only">Side-by-side comparison of DeFi development in Solidity on Ethereum versus Rust on Solana — covering architecture, token model, AMM swap logic, flash loans, cost model, and security differences.</h2>
+<style>
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.gw{padding:.5rem 0 2rem}
+#gnav{display:none;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:.5px solid var(--border)}
+.gtab{padding:5px 13px;border-radius:var(--radius);border:.5px solid var(--border);background:transparent;color:var(--text-secondary);font-size:13px;cursor:pointer}
+.gtab:hover,.gtab.active{background:var(--surface-1);color:var(--text-primary);border-color:var(--border-strong)}
+.gtab.active{font-weight:500}
+.lbl{font-size:11px;color:var(--text-muted);font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin:0 0 10px}
+.sec-t{font-size:20px;font-weight:500;color:var(--text-primary);margin:4px 0 5px}
+.sec-s{font-size:13px;color:var(--text-secondary);margin:0 0 1.5rem;line-height:1.65}
+.col2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+.col3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
+.card{background:var(--surface-1);border:.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem}
+.ct{font-size:13px;font-weight:500;color:var(--text-primary);margin:0 0 5px}
+.cb{font-size:13px;color:var(--text-secondary);margin:0;line-height:1.5}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;margin-right:4px;margin-bottom:6px}
+.ba{background:var(--bg-accent);color:var(--text-accent)}
+.bg{background:var(--bg-success);color:var(--text-success)}
+.bw{background:var(--bg-warning);color:var(--text-warning)}
+.bd{background:var(--bg-danger);color:var(--text-danger)}
+.bp{background:var(--bg-pro);color:var(--text-pro)}
+.div{border:none;border-top:.5px solid var(--border);margin:1.5rem 0}
+.code{background:var(--surface-0);border:.5px solid var(--border);border-radius:var(--radius);padding:.9rem 1rem;font-family:var(--font-mono);font-size:11px;color:var(--text-primary);line-height:1.75;overflow-x:auto;white-space:pre;margin:0}
+.code-hd{font-size:11px;font-weight:500;padding:7px 12px;border-radius:var(--radius) var(--radius) 0 0;border:.5px solid var(--border);border-bottom:none;margin-bottom:0}
+.code-hd-a{background:var(--bg-accent);color:var(--text-accent)}
+.code-hd-p{background:var(--bg-pro);color:var(--text-pro)}
+.code-wrap{margin-bottom:1.5rem}
+.kw{color:var(--text-accent)}
+.str{color:var(--text-success)}
+.cmt{color:var(--text-muted)}
+.mac{color:var(--text-pro)}
+.ok{color:var(--text-success)}
+.err{color:var(--text-danger)}
+.warn{color:var(--text-warning)}
+.cmp{display:grid;gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem}
+.cc{background:var(--surface-1);padding:.7rem 1rem}
+.cc0{background:var(--surface-0);padding:.7rem 1rem}
+.ch{font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:.5rem}
+.cr{font-size:12px;color:var(--text-secondary);padding:4px 0;border-top:.5px solid var(--border)}
+.note{background:var(--bg-warning);border:.5px solid var(--border-warning);border-radius:var(--radius);padding:9px 12px;font-size:12px;color:var(--text-warning);margin-bottom:1rem}
+.good{background:var(--bg-success);border:.5px solid var(--border-success);border-radius:var(--radius);padding:9px 12px;font-size:12px;color:var(--text-success);margin-bottom:1rem}
+.inline{font-family:var(--font-mono);font-size:11px;background:var(--surface-0);border:.5px solid var(--border);border-radius:4px;padding:1px 5px;color:var(--text-primary)}
+table.t{width:100%;font-size:12px;border-collapse:collapse;margin-bottom:1.5rem}
+table.t th{text-align:left;padding:7px 10px;color:var(--text-secondary);font-weight:500;border-bottom:.5px solid var(--border);background:var(--surface-0)}
+table.t td{padding:7px 10px;color:var(--text-secondary);border-bottom:.5px solid var(--border)}
+table.t td.lc{font-weight:500;color:var(--text-primary);font-family:var(--font-sans);font-size:12px}
+table.t tr:last-child td{border-bottom:none}
+.ac{border-color:var(--border-accent)!important}
+.pc{border-color:var(--border-pro)!important}
+.dc{border-color:var(--border-danger)!important}
+.wc{border-color:var(--border-warning)!important}
+.hdr{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ico{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+</style>
+
+<div class="gw">
+<div id="gnav"></div>
+
+<!-- S1: ARCHITECTURE -->
+<div class="gsec" id="s1" data-label="Architecture">
+<p class="lbl">The fundamental split</p>
+<h3 class="sec-t">Stateful contracts vs stateless programs</h3>
+<p class="sec-s">This is the root of every other difference. On Ethereum, a contract is both the logic and the storage. On Solana, the program is pure logic — all state lives in separate accounts that must be explicitly passed in on every call.</p>
+
+<div class="cmp" style="grid-template-columns:1.2fr 1fr 1fr">
+  <div class="cc0"><div class="ch">Architectural concept</div>
+    <div class="cr">Where state lives</div>
+    <div class="cr">Program / contract identity</div>
+    <div class="cr">Calling a function</div>
+    <div class="cr">Storing user balances</div>
+    <div class="cr">Token reserves in AMM</div>
+    <div class="cr">Access control</div>
+    <div class="cr">Composability mechanism</div>
+    <div class="cr">Parallelism</div>
+  </div>
+  <div class="cc" style="border-left:2px solid var(--border-accent)">
+    <div class="ch" style="color:var(--text-accent)">Solidity / Ethereum</div>
+    <div class="cr">Inside the contract at storage slots</div>
+    <div class="cr">Contract address owns its storage</div>
+    <div class="cr">Send a tx to the contract address</div>
+    <div class="cr">mapping(address => uint256) inside contract</div>
+    <div class="cr">uint112 reserve0, reserve1 inside pool contract</div>
+    <div class="cr">msg.sender checked against owner slot</div>
+    <div class="cr">Synchronous function calls (same tx frame)</div>
+    <div class="cr">Sequential — one tx at a time per block</div>
+  </div>
+  <div class="cc" style="border-left:2px solid var(--border-pro)">
+    <div class="ch" style="color:var(--text-pro)">Rust / Solana</div>
+    <div class="cr">Separate data accounts owned by the program</div>
+    <div class="cr">Program ID (deploy address) + authority key</div>
+    <div class="cr">Submit instruction with list of accounts</div>
+    <div class="cr">Separate SPL Token accounts per user per mint</div>
+    <div class="cr">SPL Token vault accounts owned by a pool PDA</div>
+    <div class="cr">Signer account checked in #[account] constraint</div>
+    <div class="cr">CPI (Cross-Program Invocations)</div>
+    <div class="cr">Parallel — non-overlapping account sets run concurrently</div>
+  </div>
+</div>
+
+<p class="lbl">What an AMM pool looks like structurally</p>
+<div class="col2">
+  <div>
+    <div class="code-hd code-hd-a">Ethereum — pool is one self-contained contract</div>
+    <div class="code"><span class="cmt">// The contract IS the pool.
+// It holds both the logic AND the state.</span>
+<span class="kw">contract</span> UniswapV2Pair {
+    <span class="cmt">// State lives in storage slots</span>
+    <span class="kw">address public</span> token0;
+    <span class="kw">address public</span> token1;
+    <span class="kw">uint112 private</span> reserve0;  <span class="cmt">// slot 2</span>
+    <span class="kw">uint112 private</span> reserve1;  <span class="cmt">// slot 2 (packed)</span>
+    <span class="kw">uint256 public</span> totalSupply; <span class="cmt">// LP tokens minted</span>
+    mapping(<span class="kw">address</span>=><span class="kw">uint256</span>) <span class="kw">public</span> balanceOf; <span class="cmt">// LP balances</span>
+
+    <span class="cmt">// Logic lives in the same contract</span>
+    <span class="kw">function</span> swap(
+        <span class="kw">uint256</span> amount0Out,
+        <span class="kw">uint256</span> amount1Out,
+        <span class="kw">address</span> to
+    ) <span class="kw">external</span> {
+        <span class="cmt">// reads reserve0, reserve1 from THIS contract's storage</span>
+        <span class="cmt">// calls token0.transfer(), token1.transfer()</span>
+        <span class="cmt">// writes updated reserves back to THIS contract's storage</span>
+    }
+}
+
+<span class="cmt">// To call it: just one address needed</span>
+pair.swap(amountOut, 0, recipient);</div>
+  </div>
+  <div>
+    <div class="code-hd code-hd-p">Solana — program is stateless, accounts hold everything</div>
+    <div class="code"><span class="cmt">// The PROGRAM is pure logic — no storage of its own.
+// State is in accounts passed in with every instruction.</span>
+<span class="mac">#[program]</span>
+<span class="kw">pub mod</span> amm {
+    <span class="kw">pub fn</span> swap(ctx: Context&lt;Swap&gt;, amount_in: <span class="kw">u64</span>) -> Result&lt;()&gt; {
+        <span class="cmt">// ALL state arrives via ctx.accounts — nothing stored in program</span>
+        <span class="kw">let</span> pool = &ctx.accounts.pool;        <span class="cmt">// pool config account</span>
+        <span class="kw">let</span> reserve_a = ctx.accounts.vault_a.amount; <span class="cmt">// SPL Token vault</span>
+        <span class="kw">let</span> reserve_b = ctx.accounts.vault_b.amount; <span class="cmt">// SPL Token vault</span>
+        <span class="cmt">// compute, validate, CPI to SPL Token program...</span>
+        Ok(())
+    }
+}
+
+<span class="cmt">// Pool state stored in a PDA data account</span>
+<span class="mac">#[account]</span>
+<span class="kw">pub struct</span> PoolState {
+    <span class="kw">pub</span> token_mint_a: Pubkey,  <span class="cmt">// which token</span>
+    <span class="kw">pub</span> token_mint_b: Pubkey,
+    <span class="kw">pub</span> lp_mint:      Pubkey,  <span class="cmt">// LP token mint</span>
+    <span class="kw">pub</span> fee_bps:      <span class="kw">u16</span>,     <span class="cmt">// fee in basis points</span>
+    <span class="kw">pub</span> bump:         <span class="kw">u8</span>,
+}
+<span class="cmt">// Actual reserves: held in SPL Token vault accounts (vault_a, vault_b)</span>
+<span class="cmt">// LP balances: held in per-user SPL Token accounts (not a mapping)</span>
+
+<span class="cmt">// To call it: must list ALL accounts in the instruction</span>
+<span class="cmt">// [pool, vault_a, vault_b, user_token_a, user_token_b, lp_mint, ...]</span></div>
+  </div>
+</div>
+<button onclick="sendPrompt('How does Solana Sealevel parallel execution actually work — how does it decide which transactions can run in parallel and which must be sequential?')">How Sealevel parallel execution works ↗</button>
+</div>
+
+<!-- S2: TOKEN MODEL -->
+<div class="gsec" id="s2" data-label="Token model">
+<p class="lbl">ERC-20 vs SPL Token — a core DeFi difference</p>
+<h3 class="sec-t">How tokens move in each ecosystem</h3>
+<p class="sec-s">On Ethereum, every token is its own smart contract. On Solana, a single SPL Token program manages all tokens — each user needs a separate "associated token account" for every mint they hold. This changes how approvals, transfers, and DeFi integrations work.</p>
+
+<div class="cmp" style="grid-template-columns:1.3fr 1fr 1fr">
+  <div class="cc0"><div class="ch">Token dimension</div>
+    <div class="cr">Token deployment</div><div class="cr">Balance storage</div>
+    <div class="cr">DeFi approval flow</div><div class="cr">Transfer from user to pool</div>
+    <div class="cr">Creating a new token</div><div class="cr">Token account creation cost</div>
+    <div class="cr">Wrapping native token</div><div class="cr">Token metadata</div>
+  </div>
+  <div class="cc" style="border-left:2px solid var(--border-accent)">
+    <div class="ch" style="color:var(--text-accent)">ERC-20 (Ethereum)</div>
+    <div class="cr">Deploy a new contract per token</div>
+    <div class="cr">mapping inside the token contract</div>
+    <div class="cr">approve() then transferFrom() — 2 txs</div>
+    <div class="cr">token.transferFrom(user, pool, amount)</div>
+    <div class="cr">Deploy ERC-20 contract (~$50–$500)</div>
+    <div class="cr">No separate account needed</div>
+    <div class="cr">WETH contract (wrap ETH to ERC-20)</div>
+    <div class="cr">Not standard — optional, off-chain</div>
+  </div>
+  <div class="cc" style="border-left:2px solid var(--border-pro)">
+    <div class="ch" style="color:var(--text-pro)">SPL Token (Solana)</div>
+    <div class="cr">Create a "mint account" (one tx, ~0.002 SOL)</div>
+    <div class="cr">Separate "token account" per user per mint</div>
+    <div class="cr">No approve needed — user signs directly</div>
+    <div class="cr">token::transfer with user as signer</div>
+    <div class="cr">Create mint account (~$0.002)</div>
+    <div class="cr">Create ATA: ~0.002 SOL rent per account</div>
+    <div class="cr">Wrapped SOL (wSOL) — SPL mint of native SOL</div>
+    <div class="cr">Metaplex Token Metadata (standardized)</div>
+  </div>
+</div>
+
+<p class="lbl">The approve/transferFrom pattern vs direct signing</p>
+<div class="col2">
+  <div>
+    <div class="code-hd code-hd-a">ERC-20 — two transactions to swap</div>
+    <div class="code"><span class="cmt">// Step 1 (separate tx): user approves the DEX to spend tokens</span>
+IERC20(tokenA).approve(dexAddress, amount);
+
+<span class="cmt">// Step 2 (separate tx): DEX pulls tokens from user</span>
+<span class="kw">function</span> swap(<span class="kw">address</span> tokenIn, <span class="kw">uint256</span> amountIn) <span class="kw">external</span> {
+    <span class="cmt">// Pool calls transferFrom — user approved this</span>
+    IERC20(tokenIn).transferFrom(
+        msg.sender,   <span class="cmt">// from: user</span>
+        address(this), <span class="cmt">// to: this pool contract</span>
+        amountIn
+    );
+    <span class="cmt">// ... compute output, send back ...</span>
+}
+
+<span class="cmt">// Common UX pattern: approve(MAX_UINT256) once,
+// then call swap() many times without re-approving.
+// Security risk: unlimited approval to a potentially buggy contract.</span></div>
+  </div>
+  <div>
+    <div class="code-hd code-hd-p">SPL Token — user signs the instruction directly</div>
+    <div class="code"><span class="cmt">// ONE transaction — no prior approval needed.
+// User signs the instruction; their signature IS the authority.</span>
+
+<span class="mac">#[derive(Accounts)]</span>
+<span class="kw">pub struct</span> Swap&lt;<span class="str">'info</span>&gt; {
+    <span class="mac">#[account(mut)]</span>
+    <span class="kw">pub</span> user: Signer&lt;<span class="str">'info</span>&gt;, <span class="cmt">// signs the tx — IS the authority</span>
+
+    <span class="mac">#[account(mut, token::authority = user)]</span>
+    <span class="kw">pub</span> user_token_a: Account&lt;<span class="str">'info</span>, TokenAccount&gt;,
+
+    <span class="mac">#[account(mut, token::authority = user)]</span>
+    <span class="kw">pub</span> user_token_b: Account&lt;<span class="str">'info</span>, TokenAccount&gt;,
+
+    <span class="mac">#[account(mut)]</span>
+    <span class="kw">pub</span> vault_a: Account&lt;<span class="str">'info</span>, TokenAccount&gt;, <span class="cmt">// pool's reserve</span>
+
+    <span class="mac">#[account(mut)]</span>
+    <span class="kw">pub</span> vault_b: Account&lt;<span class="str">'info</span>, TokenAccount&gt;, <span class="cmt">// pool's reserve</span>
+
+    <span class="kw">pub</span> token_program: Program&lt;<span class="str">'info</span>, Token&gt;,
+    <span class="mac">/* also: pool PDA, pool authority PDA, lp_mint... */</span>
+}
+<span class="cmt">// Client must construct and pass ALL these accounts.
+// Missing any → transaction fails immediately.</span>
+
+<span class="cmt">// Downside: each new token type needs a new ATA created
+// (~0.002 SOL one-time cost, front-end usually creates it)</span></div>
+  </div>
+</div>
+<button onclick="sendPrompt('Explain Solana Associated Token Accounts in depth — how are they derived, who pays for them, and what happens when a token account doesnt exist yet in a DeFi transaction?')">How associated token accounts work ↗</button>
+</div>
+
+<!-- S3: AMM SWAP LOGIC -->
+<div class="gsec" id="s3" data-label="AMM swap logic">
+<p class="lbl">Same math, completely different plumbing</p>
+<h3 class="sec-t">Implementing a constant-product AMM swap</h3>
+<p class="sec-s">The x·y=k invariant is the same on both chains. What differs is how reserves are read, how tokens move, and how the pool "signs" the transfer out — PDAs on Solana play the role that the contract address plays on Ethereum.</p>
+
+<div class="col2">
+  <div>
+    <div class="code-hd code-hd-a">Solidity — Uniswap v2-style constant-product swap</div>
+    <div class="code"><span class="cmt">// SPDX-License-Identifier: MIT
+// pragma solidity ^0.8.20;</span>
+
+<span class="kw">function</span> swap(
+    <span class="kw">uint256</span> amountIn,
+    <span class="kw">bool</span>    zeroForOne,
+    <span class="kw">address</span> recipient
+) <span class="kw">external</span> nonReentrant {
+    (uint112 r0, uint112 r1,) = getReserves();
+
+    (uint112 rIn, uint112 rOut,
+     <span class="kw">address</span> tIn, <span class="kw">address</span> tOut) = zeroForOne
+        ? (r0, r1, token0, token1)
+        : (r1, r0, token1, token0);
+
+    <span class="cmt">// x*y=k: amountOut = rOut*amountIn / (rIn+amountIn)</span>
+    <span class="cmt">// With 0.3% fee: amountIn *= 997/1000</span>
+    <span class="kw">uint256</span> amountInWithFee = amountIn * <span class="kw">997</span>;
+    <span class="kw">uint256</span> amountOut = (<span class="kw">uint256</span>(rOut) * amountInWithFee)
+        / (<span class="kw">uint256</span>(rIn) * <span class="kw">1000</span> + amountInWithFee);
+
+    <span class="kw">require</span>(amountOut > <span class="kw">0</span>, <span class="str">"Insufficient output"</span>);
+
+    <span class="cmt">// Pull tokenIn from caller (requires prior approve)</span>
+    IERC20(tIn).transferFrom(msg.sender, address(<span class="kw">this</span>), amountIn);
+
+    <span class="cmt">// Push tokenOut to recipient — pool contract IS the authority</span>
+    IERC20(tOut).transfer(recipient, amountOut);
+
+    <span class="cmt">// Update reserve state (pool's own storage slots)</span>
+    _update(
+        IERC20(token0).balanceOf(address(<span class="kw">this</span>)),
+        IERC20(token1).balanceOf(address(<span class="kw">this</span>))
+    );
+
+    <span class="kw">emit</span> Swap(msg.sender, amountIn, amountOut, recipient);
+}</div>
+  </div>
+  <div>
+    <div class="code-hd code-hd-p">Rust/Anchor — Orca Whirlpool-style swap</div>
+    <div class="code"><span class="kw">pub fn</span> swap(
+    ctx: Context&lt;Swap&gt;,
+    amount_in:   <span class="kw">u64</span>,
+    minimum_out: <span class="kw">u64</span>,  <span class="cmt">// slippage guard</span>
+    a_to_b:      <span class="kw">bool</span>,
+) -> Result&lt;()&gt; {
+    <span class="kw">let</span> pool    = &ctx.accounts.pool;
+    <span class="kw">let</span> vault_a = &ctx.accounts.vault_a;
+    <span class="kw">let</span> vault_b = &ctx.accounts.vault_b;
+
+    <span class="cmt">// reserves read from SPL Token vault accounts</span>
+    <span class="kw">let</span> (r_in, r_out) = <span class="kw">if</span> a_to_b
+        { (vault_a.amount, vault_b.amount) }
+        <span class="kw">else</span> { (vault_b.amount, vault_a.amount) };
+
+    <span class="cmt">// same x*y=k math, but use u128 to avoid u64 overflow</span>
+    <span class="kw">let</span> amount_in_fee = (<span class="kw">amount_in as u128</span>) * <span class="num">997</span>;
+    <span class="kw">let</span> amount_out = ((<span class="kw">r_out as u128</span>) * amount_in_fee)
+        / ((<span class="kw">r_in as u128</span>) * <span class="num">1000</span> + amount_in_fee);
+    <span class="kw">let</span> amount_out = amount_out <span class="kw">as u64</span>;
+
+    require!(amount_out >= minimum_out, AmmError::SlippageExceeded);
+
+    <span class="cmt">// Transfer IN: user signs — no prior approve needed</span>
+    token::transfer(CpiContext::new(
+        ctx.accounts.token_program.to_account_info(),
+        Transfer {
+            from:      ctx.accounts.user_token_in.to_account_info(),
+            to:        ctx.accounts.vault_in.to_account_info(),
+            authority: ctx.accounts.user.to_account_info(), <span class="cmt">// user signs</span>
+        }
+    ), amount_in)?;
+
+    <span class="cmt">// Transfer OUT: pool PDA signs (no private key — program signs)</span>
+    <span class="kw">let</span> seeds = &[b<span class="str">"pool"</span>, pool.token_mint_a.as_ref(), pool.token_mint_b.as_ref(), &[pool.bump]];
+    token::transfer(CpiContext::new_with_signer(
+        ctx.accounts.token_program.to_account_info(),
+        Transfer {
+            from:      ctx.accounts.vault_out.to_account_info(),
+            to:        ctx.accounts.user_token_out.to_account_info(),
+            authority: ctx.accounts.pool_authority.to_account_info(), <span class="cmt">// PDA</span>
+        },
+        &[seeds]  <span class="cmt">// PDA signs on behalf of the pool</span>
+    ), amount_out)?;
+
+    emit!(SwapEvent { amount_in, amount_out, user: ctx.accounts.user.key() });
+    Ok(())
+}</div>
+  </div>
+</div>
+<div class="note" style="margin-top:-.5rem"><i class="ti ti-alert-triangle" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>Key math difference: Solidity uses <span class="inline" style="background:var(--bg-accent);color:var(--text-accent);border:none;font-family:var(--font-mono);font-size:11px;padding:1px 5px;border-radius:4px">uint256</span> natively and can handle large intermediate values. In Rust/Solana, token amounts are <span class="inline" style="background:var(--bg-accent);color:var(--text-accent);border:none;font-family:var(--font-mono);font-size:11px;padding:1px 5px;border-radius:4px">u64</span> (max ~18.4 billion with 9 decimals) — always cast to <span class="inline" style="background:var(--bg-accent);color:var(--text-accent);border:none;font-family:var(--font-mono);font-size:11px;padding:1px 5px;border-radius:4px">u128</span> for intermediate calculations to prevent overflow.</div>
+<button onclick="sendPrompt('How does Uniswap v3 concentrated liquidity differ architecturally from v2 — and has anyone built a concentrated liquidity AMM on Solana, and how did they solve the tick bitmap problem?')">Concentrated liquidity AMMs on both chains ↗</button>
+</div>
+
+<!-- S4: FLASH LOANS -->
+<div class="gsec" id="s4" data-label="Flash loans">
+<p class="lbl">Flash loans — same concept, completely different implementation</p>
+<h3 class="sec-t">Atomic borrowing in Solidity vs Rust</h3>
+<p class="sec-s">Both chains support flash loans — uncollateralized loans that must be repaid within a single atomic transaction. On Ethereum, they use a callback pattern. On Solana, they use instruction ordering within one transaction — there's no callback; the repayment instruction is simply appended after the usage instruction.</p>
+
+<div class="col2">
+  <div>
+    <div class="code-hd code-hd-a">Solidity (Aave v3) — callback pattern</div>
+    <div class="code"><span class="cmt">// ── LENDER SIDE (Aave pool contract) ──</span>
+<span class="kw">function</span> flashLoan(
+    <span class="kw">address</span>   receiver,
+    <span class="kw">address</span>[] <span class="kw">calldata</span> assets,
+    <span class="kw">uint256</span>[] <span class="kw">calldata</span> amounts,
+    <span class="kw">bytes calldata</span>    params
+) <span class="kw">external</span> {
+    <span class="cmt">// 1. Transfer funds to receiver</span>
+    <span class="kw">for</span> (<span class="kw">uint</span> i = <span class="kw">0</span>; i < assets.length; i++) {
+        IERC20(assets[i]).transfer(receiver, amounts[i]);
+    }
+
+    <span class="cmt">// 2. CALLBACK: receiver must implement this interface</span>
+    IFlashLoanReceiver(receiver).executeOperation(
+        assets, amounts, premiums, msg.sender, params
+    );
+
+    <span class="cmt">// 3. Check repayment — revert entire tx if not repaid</span>
+    <span class="kw">for</span> (<span class="kw">uint</span> i = <span class="kw">0</span>; i < assets.length; i++) {
+        <span class="kw">uint256</span> owed = amounts[i] + premiums[i];
+        IERC20(assets[i]).transferFrom(receiver, address(<span class="kw">this</span>), owed);
+    }
+}
+
+<span class="cmt">// ── BORROWER SIDE ──</span>
+<span class="kw">contract</span> Arbitrageur <span class="kw">is</span> IFlashLoanReceiver {
+    <span class="kw">function</span> executeOperation(
+        <span class="kw">address</span>[] <span class="kw">calldata</span> assets,
+        <span class="kw">uint256</span>[] <span class="kw">calldata</span> amounts,
+        <span class="kw">uint256</span>[] <span class="kw">calldata</span> premiums,
+        <span class="kw">address</span>,
+        <span class="kw">bytes calldata</span>
+    ) <span class="kw">external override returns</span> (<span class="kw">bool</span>) {
+        <span class="cmt">// 💰 Use the borrowed funds here</span>
+        <span class="cmt">// e.g. buy on Uniswap, sell on Curve</span>
+        _arbitrage(assets[0], amounts[0]);
+
+        <span class="cmt">// Approve repayment (amount + fee)</span>
+        <span class="kw">uint256</span> owed = amounts[<span class="kw">0</span>] + premiums[<span class="kw">0</span>];
+        IERC20(assets[<span class="kw">0</span>]).approve(AAVE_POOL, owed);
+        <span class="kw">return true</span>;
+    }
+}</div>
+  </div>
+  <div>
+    <div class="code-hd code-hd-p">Rust/Solana — instruction ordering pattern</div>
+    <div class="code"><span class="cmt">// No callback. The client builds one transaction with
+// multiple instructions. Order enforces the loan lifecycle.</span>
+
+<span class="cmt">// ── INSTRUCTION 1: borrow (transfers funds out) ──</span>
+<span class="kw">pub fn</span> flash_borrow(ctx: Context&lt;FlashBorrow&gt;, amount: <span class="kw">u64</span>) -> Result&lt;()&gt; {
+    <span class="kw">let</span> state = &<span class="kw">mut</span> ctx.accounts.flash_state;
+
+    <span class="cmt">// Record snapshot BEFORE the loan</span>
+    state.pre_vault_balance = ctx.accounts.vault.amount;
+    state.borrow_amount     = amount;
+    state.loan_fee          = amount / <span class="num">1000</span>; <span class="cmt">// 0.1% fee</span>
+
+    <span class="cmt">// Transfer out to borrower — PDA-signed</span>
+    token::transfer(CpiContext::new_with_signer(
+        ctx.accounts.token_program.to_account_info(),
+        Transfer { from: ctx.accounts.vault.to_account_info(),
+                   to: ctx.accounts.borrower_ata.to_account_info(),
+                   authority: ctx.accounts.vault_authority.to_account_info() },
+        &[&[b<span class="str">"vault_auth"</span>, &[ctx.accounts.pool.bump]]]
+    ), amount)?;
+
+    Ok(())  <span class="cmt">// flash_state records the debt</span>
+}
+
+<span class="cmt">// ── INSTRUCTION 2: borrower does whatever they want ──
+//   (separate program instructions, e.g. arbitrage, liquidation)
+//   All in the same atomic transaction.</span>
+
+<span class="cmt">// ── INSTRUCTION 3: repay (must appear in same tx) ──</span>
+<span class="kw">pub fn</span> flash_repay(ctx: Context&lt;FlashRepay&gt;) -> Result&lt;()&gt; {
+    <span class="kw">let</span> state = &ctx.accounts.flash_state;
+    <span class="kw">let</span> expected = state.borrow_amount + state.loan_fee;
+
+    <span class="cmt">// Check vault received expected repayment</span>
+    <span class="kw">let</span> received = ctx.accounts.vault.amount
+        - state.pre_vault_balance;
+
+    require!(received >= expected, FlashError::Underpaid);
+    Ok(())
+    <span class="cmt">// If this instruction is missing or fails → entire tx reverts</span>
+}
+
+<span class="cmt">// ── CLIENT (TypeScript) builds the transaction ──
+// const tx = new Transaction()
+//   .add(flashBorrowIx)    // ix 1
+//   .add(arbitrageIx)      // ix 2 — use the funds
+//   .add(flashRepayIx)     // ix 3 — must repay or all fails</span></div>
+  </div>
+</div>
+<div class="good"><i class="ti ti-bulb" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>On Solana, because accounts must be listed upfront and transactions run atomically, a flash loan protocol can verify repayment without any callback — it simply inspects account balances at instruction 3. The entire transaction reverts if any instruction fails.</div>
+<button onclick="sendPrompt('Walk me through building a complete flash loan arbitrage bot on Solana — how do you find profitable opportunities, construct the multi-instruction transaction, and submit it quickly enough to be profitable?')">Building a Solana flash loan arbitrage bot ↗</button>
+</div>
+
+<!-- S5: COST AND PERFORMANCE -->
+<div class="gsec" id="s5" data-label="Costs and performance">
+<p class="lbl">Fee models and performance characteristics</p>
+<h3 class="sec-t">Economics of DeFi on each chain</h3>
+<p class="sec-s">Cost and performance differences are not just quantitative — they change what DeFi products are even viable. A liquidation bot, high-frequency trading strategy, or microtransaction product that's economically impossible on Ethereum can be profitable on Solana.</p>
+
+<table class="t">
+  <thead><tr><th>Metric</th><th style="color:var(--text-accent)">Ethereum</th><th style="color:var(--text-pro)">Solana</th></tr></thead>
+  <tbody>
+    <tr><td class="lc">Typical DEX swap cost</td><td>$0.50–$50 (gas dependent)</td><td>$0.0001–$0.002</td></tr>
+    <tr><td class="lc">Write to new storage slot</td><td>20,000 gas (~$1–$20)</td><td>Amortized in rent-exemption</td></tr>
+    <tr><td class="lc">Token transfer cost</td><td>~21,000–65,000 gas</td><td>~5,000–7,000 compute units</td></tr>
+    <tr><td class="lc">Transaction finality</td><td>~12s (probabilistic) / 64 slots (safe)</td><td>~400ms (optimistic) / ~1.5s (confirmed)</td></tr>
+    <tr><td class="lc">Throughput</td><td>15–30 TPS</td><td>~4,000–65,000 TPS (parallel)</td></tr>
+    <tr><td class="lc">Base fee structure</td><td>EIP-1559: base (burned) + tip to validator</td><td>5,000 lamports/signature + priority fee</td></tr>
+    <tr><td class="lc">Priority fee mechanism</td><td>Max priority fee tip per gas unit</td><td>Compute unit price (lamports per CU)</td></tr>
+    <tr><td class="lc">Account creation cost</td><td>None (mapping key = auto-initialized)</td><td>~0.002 SOL rent-exemption per account</td></tr>
+    <tr><td class="lc">LP position NFT</td><td>~$10–$100 to mint (Uniswap v3)</td><td>~$0.002 to mint (Metaplex)</td></tr>
+    <tr><td class="lc">Compressed NFT (100k)</td><td>~$100,000+</td><td>~$50 total (Bubblegum/cNFT)</td></tr>
+  </tbody>
+</table>
+
+<p class="lbl">What the cost difference enables</p>
+<div class="col3">
+  <div class="card pc">
+    <i class="ti ti-chart-line" aria-hidden="true" style="font-size:20px;color:var(--text-pro);margin-bottom:8px"></i>
+    <p class="ct">On-chain order books</p>
+    <p class="cb">Economically impossible on Ethereum (each order = gas). Serum (now OpenBook) on Solana runs a full central limit order book on-chain at $0.00001/order. Drift Protocol runs perps with an on-chain DLOB.</p>
+  </div>
+  <div class="card pc">
+    <i class="ti ti-robot" aria-hidden="true" style="font-size:20px;color:var(--text-pro);margin-bottom:8px"></i>
+    <p class="ct">High-frequency liquidations</p>
+    <p class="cb">Liquidation bots on Ethereum compete on gas price (MEV). On Solana they compete on priority fees. Sub-second finality means positions can be liquidated before significant undercollateralization builds up.</p>
+  </div>
+  <div class="card ac">
+    <i class="ti ti-users" aria-hidden="true" style="font-size:20px;color:var(--text-accent);margin-bottom:8px"></i>
+    <p class="ct">DeFi composability advantage</p>
+    <p class="cb">Ethereum wins for composability — Uniswap + Aave + Curve all in one tx is trivially cheap to compose. Solana's account listing requirement means complex multi-protocol calls need careful client-side orchestration.</p>
+  </div>
+</div>
+
+<p class="lbl">Solana rent-exemption — the hidden cost</p>
+<div class="card wc" style="margin-bottom:1.5rem">
+  <div style="display:flex;gap:12px;align-items:flex-start">
+    <i class="ti ti-coin" aria-hidden="true" style="font-size:24px;color:var(--text-warning);flex-shrink:0;margin-top:2px"></i>
+    <div>
+      <p class="ct" style="margin-bottom:6px">Accounts cost SOL to create and hold</p>
+      <p class="cb">Every Solana account must maintain a minimum SOL balance proportional to its data size (~0.002 SOL for a basic token account, ~0.009 SOL for a Metaplex NFT metadata account). This is returned when the account is closed — it's not a fee, it's a deposit. But it means every new DeFi position, token account, or LP stake creates a real on-chain cost for users. Good DeFi protocols close accounts when done and refund rent to users.</p>
+    </div>
+  </div>
+</div>
+<button onclick="sendPrompt('How do Solana priority fees and compute unit markets work — and how do MEV searchers on Solana differ from Ethereum where they use Flashbots and MEV-boost?')">MEV and priority fees: Solana vs Ethereum ↗</button>
+</div>
+
+<!-- S6: SECURITY -->
+<div class="gsec" id="s6" data-label="Security differences">
+<p class="lbl">Different chains, different attack surfaces</p>
+<h3 class="sec-t">Security vulnerabilities unique to each</h3>
+<p class="sec-s">The threats are not the same. Reentrancy is Ethereum's signature vulnerability. Solana's account model creates an entirely different class of bugs — missing signer checks and account substitution attacks — that Solidity developers must learn from scratch.</p>
+
+<p class="lbl">Solidity — top DeFi-specific vulnerabilities</p>
+<div class="col2">
+  <div>
+    <div class="code-hd code-hd-a" style="color:var(--text-danger);background:var(--bg-danger);border-color:var(--border-danger)">❌ Price oracle manipulation via flash loan</div>
+    <div class="code"><span class="kw">contract</span> VulnerableLending {
+    <span class="cmt">// ❌ NEVER use spot reserves as a price oracle</span>
+    <span class="kw">function</span> getPrice(<span class="kw">address</span> token) <span class="kw">public view returns</span> (<span class="kw">uint256</span>) {
+        (uint112 r0, uint112 r1,) = IUniswapPair(pair).getReserves();
+        <span class="kw">return</span> (<span class="kw">uint256</span>(r0) * 1e18) / <span class="kw">uint256</span>(r1); <span class="err">// ❌ manipulable!</span>
+    }
+
+    <span class="kw">function</span> borrow(<span class="kw">uint256</span> amount) <span class="kw">external</span> {
+        <span class="kw">uint256</span> price = getPrice(collateral); <span class="err">// ❌ flash loan pumps this</span>
+        <span class="err">// Attacker flash-loans, skews pool, inflates collateral price,</span>
+        <span class="err">// borrows against it, repays flash loan. Net: drain protocol.</span>
+    }
+}
+
+<span class="cmt">// ✅ Use time-weighted average price (TWAP) instead:</span>
+<span class="kw">function</span> getTWAP() <span class="kw">public view returns</span> (<span class="kw">uint256</span>) {
+    <span class="cmt">// Uniswap v3 TWAP — averaged over N seconds, resistant to flash loans</span>
+    <span class="kw">uint32</span>[] <span class="kw">memory</span> periods = <span class="kw">new uint32</span>[](<span class="kw">2</span>);
+    periods[<span class="kw">0</span>] = <span class="kw">1800</span>; periods[<span class="kw">1</span>] = <span class="kw">0</span>; <span class="cmt">// 30-minute window</span>
+    (int56[] <span class="kw">memory</span> ticks,) = IUniswapV3Pool(pool).observe(periods);
+    <span class="kw">return</span> OracleLib.getQuoteAtTick(ticks, baseAmount, token, quote);
+}</div>
+  </div>
+  <div>
+    <div class="code-hd code-hd-a" style="color:var(--text-success);background:var(--bg-success);border-color:var(--border-success)">✅ Use Chainlink for reliable price data</div>
+    <div class="code"><span class="kw">import</span> {AggregatorV3Interface} <span class="kw">from</span> <span class="str">"@chainlink/contracts"</span>;
+
+<span class="kw">contract</span> SecureLending {
+    AggregatorV3Interface <span class="kw">immutable</span> priceFeed;
+
+    <span class="kw">constructor</span>(<span class="kw">address</span> _feed) {
+        priceFeed = AggregatorV3Interface(_feed);
+    }
+
+    <span class="kw">function</span> getPrice() <span class="kw">public view returns</span> (<span class="kw">int256</span>) {
+        (
+            <span class="kw">uint80</span> roundId,
+            <span class="kw">int256</span>  price,
+            ,
+            <span class="kw">uint256</span> updatedAt,
+            <span class="kw">uint80</span>  answeredInRound
+        ) = priceFeed.latestRoundData();
+
+        <span class="ok">// ✅ Validate the answer is fresh (not stale)</span>
+        <span class="kw">require</span>(updatedAt > block.timestamp - <span class="kw">3600</span>, <span class="str">"Stale price"</span>);
+        <span class="kw">require</span>(answeredInRound >= roundId, <span class="str">"Incomplete round"</span>);
+        <span class="kw">require</span>(price > <span class="kw">0</span>, <span class="str">"Invalid price"</span>);
+
+        <span class="kw">return</span> price; <span class="ok">// manipulation-resistant aggregated price</span>
+    }
+}</div>
+  </div>
+</div>
+
+<p class="lbl">Rust / Solana — top DeFi-specific vulnerabilities</p>
+<div class="col2">
+  <div>
+    <div class="code-hd code-hd-a" style="color:var(--text-danger);background:var(--bg-danger);border-color:var(--border-danger)">❌ Missing account owner / program checks</div>
+    <div class="code"><span class="cmt">// ❌ VULNERABLE: no verification that accounts are what they claim</span>
+<span class="mac">#[derive(Accounts)]</span>
+<span class="kw">pub struct</span> VulnerableWithdraw&lt;<span class="str">'info</span>&gt; {
+    <span class="err">/// CHECK: completely unchecked — attacker can pass ANY account!</span>
+    <span class="kw">pub</span> vault:  AccountInfo&lt;<span class="str">'info</span>&gt;,  <span class="err">// ❌ attacker substitutes fake vault</span>
+    <span class="err">/// CHECK: no signer verification</span>
+    <span class="kw">pub</span> user:   AccountInfo&lt;<span class="str">'info</span>&gt;,  <span class="err">// ❌ anyone can be "user"</span>
+    <span class="kw">pub</span> token_program: AccountInfo&lt;<span class="str">'info</span>&gt;,  <span class="err">// ❌ could be a fake program!</span>
+}
+
+<span class="kw">pub fn</span> withdraw_vulnerable(ctx: Context&lt;VulnerableWithdraw&gt;, amt: <span class="kw">u64</span>) -> Result&lt;()&gt; {
+    <span class="err">// Attacker passes: their own account as vault, a fake token program</span>
+    <span class="err">// Result: they drain funds or bypass access control</span>
+    token::transfer(CpiContext::new(
+        ctx.accounts.token_program.to_account_info(), <span class="err">// ❌ could be fake</span>
+        Transfer { from: ctx.accounts.vault.to_account_info(), <span class="err">// ❌ fake vault</span>
+                   to: ..., authority: ctx.accounts.user.to_account_info() }
+    ), amt)?;
+    Ok(())
+}</div>
+  </div>
+  <div>
+    <div class="code-hd code-hd-a" style="color:var(--text-success);background:var(--bg-success);border-color:var(--border-success)">✅ Anchor constraints enforce all checks</div>
+    <div class="code"><span class="ok">// ✅ SECURE: Anchor validates every account at instruction entry</span>
+<span class="mac">#[derive(Accounts)]</span>
+<span class="kw">pub struct</span> SecureWithdraw&lt;<span class="str">'info</span>&gt; {
+    <span class="ok">// ✅ mut: writable, owner=pool_program, matches Pool type</span>
+    <span class="mac">#[account(mut, seeds=[b"pool"], bump=pool.bump, has_one=vault)]</span>
+    <span class="kw">pub</span> pool: Account&lt;<span class="str">'info</span>, Pool&gt;,
+
+    <span class="ok">// ✅ vault must match what pool.vault stores (has_one check)</span>
+    <span class="ok">// ✅ token::authority = pool_authority (only PDA can sign)</span>
+    <span class="mac">#[account(mut, token::authority = pool_authority)]</span>
+    <span class="kw">pub</span> vault: Account&lt;<span class="str">'info</span>, TokenAccount&gt;,
+
+    <span class="ok">// ✅ PDA verified against seeds+bump — no private key exists</span>
+    <span class="mac">#[account(seeds=[b"auth",pool.key().as_ref()], bump)]</span>
+    <span class="kw">pub</span> pool_authority: SystemAccount&lt;<span class="str">'info</span>&gt;,
+
+    <span class="ok">// ✅ user must sign the transaction</span>
+    <span class="mac">#[account(mut)]</span>
+    <span class="kw">pub</span> user: Signer&lt;<span class="str">'info</span>&gt;,
+
+    <span class="ok">// ✅ token_program must be the REAL SPL Token program</span>
+    <span class="kw">pub</span> token_program: Program&lt;<span class="str">'info</span>, Token&gt;,
+}
+<span class="ok">// All checks run BEFORE your function body executes.
+// Wrong account → tx rejected before any state changes.</span></div>
+  </div>
+</div>
+<div class="div"></div>
+<p class="lbl">Security checklist: what auditors look for on each chain</p>
+<div class="col2">
+  <div class="card ac">
+    <span class="badge ba" style="margin-bottom:8px">Solidity audit checklist</span>
+    <p style="font-size:12px;color:var(--text-secondary);margin:0;line-height:1.7">
+      <span style="color:var(--text-danger)">✗</span> Reentrancy via external call before state update<br>
+      <span style="color:var(--text-danger)">✗</span> Spot price oracle usage (flash-loanable)<br>
+      <span style="color:var(--text-danger)">✗</span> tx.origin used for auth instead of msg.sender<br>
+      <span style="color:var(--text-danger)">✗</span> Unprotected initialize() on upgradeable contracts<br>
+      <span style="color:var(--text-danger)">✗</span> Storage collision in proxy pattern<br>
+      <span style="color:var(--text-danger)">✗</span> Unlimited ERC-20 approvals to risky contracts<br>
+      <span style="color:var(--text-danger)">✗</span> Precision loss: division before multiplication<br>
+      <span style="color:var(--text-danger)">✗</span> Front-running on DEX/auction without slippage param<br>
+      <span style="color:var(--text-success)">✓</span> Overflow auto-checked in Solidity 0.8+<br>
+      <span style="color:var(--text-success)">✓</span> Use <span style="font-family:var(--font-mono)">nonReentrant</span> + CEI pattern religiously
+    </p>
+  </div>
+  <div class="card pc">
+    <span class="badge bp" style="margin-bottom:8px">Rust/Solana audit checklist</span>
+    <p style="font-size:12px;color:var(--text-secondary);margin:0;line-height:1.7">
+      <span style="color:var(--text-danger)">✗</span> Missing signer check (anyone can call protected instruction)<br>
+      <span style="color:var(--text-danger)">✗</span> Missing owner check (wrong program owns the account)<br>
+      <span style="color:var(--text-danger)">✗</span> Account substitution (fake account passed where real expected)<br>
+      <span style="color:var(--text-danger)">✗</span> Using unchecked AccountInfo instead of typed Account<br>
+      <span style="color:var(--text-danger)">✗</span> u64 arithmetic overflow in token math (use u128 for intermediate)<br>
+      <span style="color:var(--text-danger)">✗</span> PDA bump manipulation (always store canonical bump)<br>
+      <span style="color:var(--text-danger)">✗</span> Missing has_one / constraint linking related accounts<br>
+      <span style="color:var(--text-danger)">✗</span> CPI to unverified program (fake token program attack)<br>
+      <span style="color:var(--text-success)">✓</span> No reentrancy — Solana disallows recursive CPI by default<br>
+      <span style="color:var(--text-success)">✓</span> Anchor handles 80% of these checks via macros
+    </p>
+  </div>
+</div>
+<button onclick="sendPrompt('What are the most famous Solana program hacks — the Wormhole bridge exploit, Mango Markets manipulation, and Solend oracle issue — and what specific account or program bugs caused each one?')">Famous Solana DeFi hacks explained ↗</button>
+</div>
+
+</div>
+
+<script>
+(function(){
+  var nav=document.getElementById('gnav');
+  var secs=document.querySelectorAll('.gsec');
+  function show(id){
+    secs.forEach(function(s){s.style.display='none';});
+    document.getElementById(id).style.display='block';
+    nav.querySelectorAll('.gtab').forEach(function(b){b.classList.remove('active');});
+    nav.querySelector('[data-t="'+id+'"]').classList.add('active');
+  }
+  secs.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.className='gtab'+(i===0?' active':'');
+    b.dataset.t=s.id;
+    b.textContent=s.dataset.label;
+    b.onclick=function(){show(s.id);};
+    nav.appendChild(b);
+    if(i>0)s.style.display='none';
+  });
+  nav.style.display='flex';
+})();
+</script>

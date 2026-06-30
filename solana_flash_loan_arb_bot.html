@@ -1,0 +1,851 @@
+
+<h2 class="sr-only">Complete guide to building a Solana flash loan arbitrage bot — price monitoring, profit detection, on-chain Anchor program, transaction construction, Jito MEV bundles, and submission optimization.</h2>
+<style>
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.gw{padding:.5rem 0 2rem}
+#gnav{display:none;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:.5px solid var(--border)}
+.gtab{padding:5px 13px;border-radius:var(--radius);border:.5px solid var(--border);background:transparent;color:var(--text-secondary);font-size:13px;cursor:pointer}
+.gtab:hover,.gtab.active{background:var(--surface-1);color:var(--text-primary);border-color:var(--border-strong)}
+.gtab.active{font-weight:500}
+.lbl{font-size:11px;color:var(--text-muted);font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin:0 0 10px}
+.sec-t{font-size:20px;font-weight:500;color:var(--text-primary);margin:4px 0 5px}
+.sec-s{font-size:13px;color:var(--text-secondary);margin:0 0 1.5rem;line-height:1.65}
+.col2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+.col3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:1.5rem}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:1.5rem}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:1.5rem}
+.card{background:var(--surface-1);border:.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem}
+.ct{font-size:13px;font-weight:500;color:var(--text-primary);margin:0 0 5px}
+.cb{font-size:13px;color:var(--text-secondary);margin:0;line-height:1.5}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;margin-right:4px;margin-bottom:6px}
+.ba{background:var(--bg-accent);color:var(--text-accent)}
+.bg{background:var(--bg-success);color:var(--text-success)}
+.bw{background:var(--bg-warning);color:var(--text-warning)}
+.bd{background:var(--bg-danger);color:var(--text-danger)}
+.bp{background:var(--bg-pro);color:var(--text-pro)}
+.div{border:none;border-top:.5px solid var(--border);margin:1.5rem 0}
+.code{background:var(--surface-0);border:.5px solid var(--border);border-radius:0 0 var(--radius) var(--radius);padding:.9rem 1rem;font-family:var(--font-mono);font-size:11px;color:var(--text-primary);line-height:1.75;overflow-x:auto;white-space:pre;margin-bottom:1rem}
+.code-hd{font-size:11px;font-weight:500;padding:7px 12px;border-radius:var(--radius) var(--radius) 0 0;border:.5px solid var(--border);border-bottom:none}
+.hd-ts{background:var(--bg-accent);color:var(--text-accent)}
+.hd-rs{background:var(--bg-pro);color:var(--text-pro)}
+.hd-ok{background:var(--bg-success);color:var(--text-success)}
+.hd-warn{background:var(--bg-warning);color:var(--text-warning)}
+.kw{color:var(--text-accent)}
+.str{color:var(--text-success)}
+.cmt{color:var(--text-muted)}
+.mac{color:var(--text-pro)}
+.num{color:var(--text-warning)}
+.ok{color:var(--text-success)}
+.err{color:var(--text-danger)}
+.warn{color:var(--text-warning)}
+.typ{color:var(--text-warning)}
+.note{background:var(--bg-warning);border:.5px solid var(--border-warning);border-radius:var(--radius);padding:9px 12px;font-size:12px;color:var(--text-warning);margin-bottom:1rem;line-height:1.5}
+.good{background:var(--bg-success);border:.5px solid var(--border-success);border-radius:var(--radius);padding:9px 12px;font-size:12px;color:var(--text-success);margin-bottom:1rem;line-height:1.5}
+.info{background:var(--bg-accent);border:.5px solid var(--border-accent);border-radius:var(--radius);padding:9px 12px;font-size:12px;color:var(--text-accent);margin-bottom:1rem;line-height:1.5}
+.ac{border-color:var(--border-accent)!important}
+.pc{border-color:var(--border-pro)!important}
+.sc{border-color:var(--border-success)!important}
+.wc{border-color:var(--border-warning)!important}
+.mono{font-family:var(--font-mono);font-size:11px;background:var(--surface-0);border:.5px solid var(--border);border-radius:4px;padding:1px 5px;color:var(--text-primary)}
+.flow{display:flex;gap:0;margin-bottom:1.5rem;overflow-x:auto;padding-bottom:4px}
+.fbox{background:var(--surface-2);border:.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;min-width:110px;flex:1;flex-shrink:0}
+.fbox-t{font-size:11px;font-weight:500;color:var(--text-primary);margin-bottom:3px}
+.fbox-s{font-size:10.5px;color:var(--text-secondary);line-height:1.4}
+.farr{color:var(--text-muted);font-size:18px;flex-shrink:0;display:flex;align-items:center;padding:0 3px}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px;margin-bottom:1.5rem}
+.sc2{background:var(--surface-1);border-radius:var(--radius);padding:.75rem 1rem}
+.sl{font-size:11px;color:var(--text-muted);margin:0 0 2px}
+.sv{font-size:18px;font-weight:500;color:var(--text-primary);margin:0}
+/* Architecture diagram */
+.arch{display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr 40px 1fr;gap:0;align-items:center;margin-bottom:1.5rem}
+.abox{background:var(--surface-1);border:.5px solid var(--border);border-radius:10px;padding:.75rem .9rem;text-align:center}
+.abox-t{font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:3px}
+.abox-s{font-size:10.5px;color:var(--text-secondary);line-height:1.4}
+.aarr{text-align:center;color:var(--text-muted);font-size:20px}
+.sub-boxes{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px}
+.sub-box{background:var(--surface-0);border:.5px solid var(--border);border-radius:6px;padding:5px 8px;text-align:left}
+.sub-t{font-size:10.5px;font-weight:500;color:var(--text-primary);margin:0 0 1px}
+.sub-s{font-size:10px;color:var(--text-muted);margin:0;line-height:1.3}
+</style>
+
+<div class="gw">
+<div id="gnav"></div>
+
+<!-- S1: ARCHITECTURE -->
+<div class="gsec" id="s1" data-label="Architecture">
+<p class="lbl">End-to-end system design</p>
+<h3 class="sec-t">How the bot works</h3>
+<p class="sec-s">A Solana arb bot has four distinct layers: an off-chain monitor that watches AMM pool accounts in real time, a profit calculator that filters opportunities, a transaction builder that constructs the atomic multi-instruction tx, and a submitter that wins block inclusion via priority fees or Jito bundles.</p>
+
+<p class="lbl">System pipeline</p>
+<div class="flow">
+  <div class="fbox" style="background:var(--bg-accent);border-color:var(--border-accent)">
+    <div class="fbox-t" style="color:var(--text-accent)">1. Monitor</div>
+    <div class="fbox-s">WebSocket subscription to pool accounts. Decode reserves on every account change event.</div>
+  </div>
+  <div class="farr"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fbox">
+    <div class="fbox-t">2. Detect</div>
+    <div class="fbox-s">Compute spot prices. Calculate net profit after all fees. Filter if below threshold.</div>
+  </div>
+  <div class="farr"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fbox" style="background:var(--bg-pro);border-color:var(--border-pro)">
+    <div class="fbox-t" style="color:var(--text-pro)">3. Build tx</div>
+    <div class="fbox-s">Construct: compute budget → flash borrow → swap A → swap B → flash repay.</div>
+  </div>
+  <div class="farr"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fbox" style="background:var(--bg-success);border-color:var(--border-success)">
+    <div class="fbox-t" style="color:var(--text-success)">4. Submit</div>
+    <div class="fbox-s">Send via Jito bundle with tip. Broadcast to multiple RPCs for coverage.</div>
+  </div>
+  <div class="farr"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fbox">
+    <div class="fbox-t">5. Capture</div>
+    <div class="fbox-s">Profit deposited to wallet. Monitor for confirmation. Adjust tip for next opportunity.</div>
+  </div>
+</div>
+
+<p class="lbl">Key components and libraries</p>
+<div class="g2">
+  <div class="card ac">
+    <span class="badge ba" style="margin-bottom:8px">Off-chain (TypeScript / Rust)</span>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+      <div style="display:flex;gap:8px;align-items:flex-start"><span class="mono">@solana/web3.js</span><span class="cb" style="font-size:12px">Connection, versioned transactions, websocket subscriptions</span></div>
+      <div style="display:flex;gap:8px;align-items:flex-start"><span class="mono">@coral-xyz/anchor</span><span class="cb" style="font-size:12px">Program IDL parsing and instruction construction</span></div>
+      <div style="display:flex;gap:8px;align-items:flex-start"><span class="mono">@jito-ts/sdk</span><span class="cb" style="font-size:12px">MEV bundle submission to Jito validators</span></div>
+      <div style="display:flex;gap:8px;align-items:flex-start"><span class="mono">@orca-so/sdk</span><span class="cb" style="font-size:12px">Whirlpool pool state decoding and swap quoting</span></div>
+      <div style="display:flex;gap:8px;align-items:flex-start"><span class="mono">@raydium-io/sdk</span><span class="cb" style="font-size:12px">Raydium AMM pool state and swap instruction building</span></div>
+    </div>
+  </div>
+  <div class="card pc">
+    <span class="badge bp" style="margin-bottom:8px">On-chain (Rust / Anchor)</span>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+      <div style="display:flex;gap:8px;align-items:flex-start"><span class="mono">anchor-lang</span><span class="cb" style="font-size:12px">Account validation, instruction dispatch, error handling</span></div>
+      <div style="display:flex;gap:8px;align-items:flex-start"><span class="mono">anchor-spl</span><span class="cb" style="font-size:12px">SPL Token CPI wrappers for transfer, mint, burn</span></div>
+      <div style="display:flex;gap:8px;align-items:flex-start"><span class="mono">whirlpool CPI</span><span class="cb" style="font-size:12px">Call Orca Whirlpool's swap instruction on-chain</span></div>
+      <div style="display:flex;gap:8px;align-items:flex-start"><span class="mono">marginfi CPI</span><span class="cb" style="font-size:12px">Flash loan borrow and repay instructions</span></div>
+      <div style="display:flex;gap:8px;align-items:flex-start"><span class="mono">jupiter CPI</span><span class="cb" style="font-size:12px">Optional: route through Jupiter for best execution</span></div>
+    </div>
+  </div>
+</div>
+
+<p class="lbl">Realistic profit expectations</p>
+<div class="sg">
+  <div class="sc2"><p class="sl">Typical price gap needed</p><p class="sv">0.3–2%</p></div>
+  <div class="sc2"><p class="sl">Net profit per arb (small)</p><p class="sv">$1–$50</p></div>
+  <div class="sc2"><p class="sl">Detection latency target</p><p class="sv">&lt;50ms</p></div>
+  <div class="sc2"><p class="sl">Slot time to beat</p><p class="sv">400ms</p></div>
+  <div class="sc2"><p class="sl">Jito tip (competitive)</p><p class="sv">0.001–0.01 SOL</p></div>
+</div>
+
+<div class="note"><i class="ti ti-alert-triangle" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>Solana arbitrage is extremely competitive in 2025. Dedicated searchers co-locate validators, run in Rust for microsecond detection, and pay significant Jito tips. This guide teaches you the architecture — a production-grade bot also needs: dedicated bare-metal servers near validator clusters, gRPC subscriptions (not WebSocket) via providers like Triton or Helius, and thorough simulation before every submission.</div>
+<button onclick="sendPrompt('What are the differences between WebSocket and gRPC account subscriptions on Solana, and why do professional arbitrage bots prefer gRPC for latency-sensitive detection?')">WebSocket vs gRPC for Solana monitoring ↗</button>
+</div>
+
+<!-- S2: PRICE MONITORING -->
+<div class="gsec" id="s2" data-label="Price monitoring">
+<p class="lbl">Real-time pool state subscription</p>
+<h3 class="sec-t">Watching AMM reserves as they change</h3>
+<p class="sec-s">Every time a swap happens in a pool, the pool's on-chain account data changes. You subscribe to these account changes via WebSocket and decode the raw bytes into reserve amounts. Speed here is everything — you need to react before anyone else.</p>
+
+<div class="code-hd hd-ts">monitor.ts — subscribe to Orca and Raydium pool accounts simultaneously</div>
+<div class="code"><span class="kw">import</span> {
+  Connection, PublicKey, AccountInfo, Context
+} <span class="kw">from</span> <span class="str">'@solana/web3.js'</span>;
+<span class="kw">import</span> { WhirlpoolData } <span class="kw">from</span> <span class="str">'@orca-so/whirlpools-sdk'</span>;
+<span class="kw">import</span> { LiquidityStateV4 } <span class="kw">from</span> <span class="str">'@raydium-io/raydium-sdk-v2'</span>;
+<span class="kw">import</span> * <span class="kw">as</span> BN <span class="kw">from</span> <span class="str">'bn.js'</span>;
+
+<span class="cmt">// ── Pool addresses for SOL/USDC pair on both DEXes ──</span>
+<span class="kw">const</span> ORCA_SOL_USDC_WHIRLPOOL  = <span class="kw">new</span> PublicKey(<span class="str">'HJPjoWUrhoZzkNfRpHuieeFk9WcZWjwy6PBjZ81ngndJ'</span>);
+<span class="kw">const</span> RAYDIUM_SOL_USDC_POOL    = <span class="kw">new</span> PublicKey(<span class="str">'58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWagsenfME4NG'</span>);
+<span class="kw">const</span> USDC_DECIMALS = <span class="num">6</span>;
+<span class="kw">const</span> SOL_DECIMALS  = <span class="num">9</span>;
+
+<span class="kw">interface</span> PoolPrice {
+  dex:       <span class="typ">string</span>;
+  pool:      PublicKey;
+  priceUsdc: <span class="typ">number</span>; <span class="cmt">// SOL price in USDC</span>
+  sqrtPrice: BN;
+  timestamp: <span class="typ">number</span>;
+}
+
+<span class="kw">class</span> PriceMonitor {
+  <span class="kw">private</span> prices = <span class="kw">new</span> Map&lt;<span class="typ">string</span>, PoolPrice&gt;();
+  <span class="kw">private</span> onOpportunity: (opp: ArbOpportunity) => <span class="typ">void</span>;
+
+  <span class="kw">constructor</span>(
+    <span class="kw">private</span> conn: Connection,
+    onOpp: (o: ArbOpportunity) => <span class="typ">void</span>
+  ) { <span class="kw">this</span>.onOpportunity = onOpp; }
+
+  <span class="kw">async</span> start() {
+    <span class="cmt">// Subscribe to Orca Whirlpool account changes</span>
+    <span class="kw">this</span>.conn.onAccountChange(
+      ORCA_SOL_USDC_WHIRLPOOL,
+      (info, ctx) => <span class="kw">this</span>.handleOrca(info, ctx),
+      <span class="str">'processed'</span> <span class="cmt">// fastest commitment — not yet confirmed</span>
+    );
+
+    <span class="cmt">// Subscribe to Raydium AMM pool account changes</span>
+    <span class="kw">this</span>.conn.onAccountChange(
+      RAYDIUM_SOL_USDC_POOL,
+      (info, ctx) => <span class="kw">this</span>.handleRaydium(info, ctx),
+      <span class="str">'processed'</span>
+    );
+
+    console.log(<span class="str">'Subscribed to pools. Monitoring for opportunities...'</span>);
+  }
+
+  <span class="kw">private</span> handleOrca(info: AccountInfo&lt;<span class="typ">Buffer</span>&gt;, ctx: Context) {
+    <span class="kw">const</span> pool = WhirlpoolData.decode(info.data); <span class="cmt">// Orca SDK decodes layout</span>
+
+    <span class="cmt">// Orca uses Q64.64 sqrt price — convert to human-readable</span>
+    <span class="kw">const</span> sqrtPrice     = pool.sqrtPrice;
+    <span class="kw">const</span> rawPrice      = sqrtPrice.toNumber() ** <span class="num">2</span> / (<span class="num">2</span> ** <span class="num">64</span>);
+    <span class="kw">const</span> decimalAdj    = <span class="num">10</span> ** (USDC_DECIMALS - SOL_DECIMALS);
+    <span class="kw">const</span> priceUsdc     = rawPrice / decimalAdj;
+
+    <span class="kw">this</span>.prices.set(<span class="str">'orca'</span>, {
+      dex: <span class="str">'orca'</span>, pool: ORCA_SOL_USDC_WHIRLPOOL,
+      priceUsdc, sqrtPrice, timestamp: Date.now()
+    });
+
+    <span class="kw">this</span>.checkOpportunity();
+  }
+
+  <span class="kw">private</span> handleRaydium(info: AccountInfo&lt;<span class="typ">Buffer</span>&gt;, ctx: Context) {
+    <span class="kw">const</span> pool = LiquidityStateV4.decode(info.data); <span class="cmt">// Raydium SDK</span>
+
+    <span class="cmt">// Raydium constant-product: price = baseVault / quoteVault (adjusted for decimals)</span>
+    <span class="kw">const</span> baseAmt   = pool.baseVault.toNumber()  / <span class="num">10</span> ** SOL_DECIMALS;
+    <span class="kw">const</span> quoteAmt  = pool.quoteVault.toNumber() / <span class="num">10</span> ** USDC_DECIMALS;
+    <span class="kw">const</span> priceUsdc = quoteAmt / baseAmt; <span class="cmt">// USDC per SOL</span>
+
+    <span class="kw">this</span>.prices.set(<span class="str">'raydium'</span>, {
+      dex: <span class="str">'raydium'</span>, pool: RAYDIUM_SOL_USDC_POOL,
+      priceUsdc, sqrtPrice: <span class="kw">new</span> BN(<span class="num">0</span>), timestamp: Date.now()
+    });
+
+    <span class="kw">this</span>.checkOpportunity();
+  }
+
+  <span class="kw">private</span> checkOpportunity() {
+    <span class="kw">const</span> orca    = <span class="kw">this</span>.prices.get(<span class="str">'orca'</span>);
+    <span class="kw">const</span> raydium = <span class="kw">this</span>.prices.get(<span class="str">'raydium'</span>);
+    <span class="kw">if</span> (!orca || !raydium) <span class="kw">return</span>; <span class="cmt">// need both prices</span>
+
+    <span class="cmt">// Stale data guard — discard prices older than 2 slots (800ms)</span>
+    <span class="kw">if</span> (Date.now() - Math.min(orca.timestamp, raydium.timestamp) > <span class="num">800</span>) <span class="kw">return</span>;
+
+    <span class="kw">const</span> priceDiff = Math.abs(orca.priceUsdc - raydium.priceUsdc);
+    <span class="kw">const</span> midPrice  = (orca.priceUsdc + raydium.priceUsdc) / <span class="num">2</span>;
+    <span class="kw">const</span> pctDiff   = priceDiff / midPrice;
+
+    console.log(<span class="str">`Orca: $${orca.priceUsdc.toFixed(4)}  Raydium: $${raydium.priceUsdc.toFixed(4)}  Δ: ${(pctDiff*100).toFixed(4)}%`</span>);
+
+    <span class="kw">if</span> (pctDiff > <span class="num">0.003</span>) { <span class="cmt">// 0.3% minimum gap (covers typical fees)</span>
+      <span class="kw">this</span>.onOpportunity({ orca, raydium, pctDiff, midPrice });
+    }
+  }
+}</div>
+
+<div class="code-hd hd-ts" style="margin-top:-.5rem">Alternative: gRPC subscription (10x lower latency than WebSocket)</div>
+<div class="code"><span class="kw">import</span> { GeyserClient } <span class="kw">from</span> <span class="str">'@triton-one/yellowstone-grpc'</span>;
+
+<span class="cmt">// gRPC Geyser plugin streams account updates directly from validator
+// Subscription delivers updates in &lt;5ms vs WebSocket's 30–80ms</span>
+<span class="kw">const</span> client = <span class="kw">new</span> GeyserClient(<span class="str">'https://your-node.rpcpool.com:443'</span>, apiKey);
+
+<span class="kw">const</span> stream = client.subscribe();
+stream.write({
+  accounts: {
+    solUsdc: {
+      account: [
+        ORCA_SOL_USDC_WHIRLPOOL.toBase58(),
+        RAYDIUM_SOL_USDC_POOL.toBase58()
+      ],
+      filters: [] <span class="cmt">// subscribe to all data changes</span>
+    }
+  }
+});
+
+stream.on(<span class="str">'data'</span>, (update) => {
+  <span class="kw">if</span> (update.account) {
+    <span class="kw">const</span> { account, pubkey } = update.account.account;
+    <span class="kw">const</span> data = Buffer.from(account.data);
+    <span class="cmt">// decode and check opportunity — same logic as above, much faster delivery</span>
+    processAccountUpdate(pubkey, data);
+  }
+});</div>
+<button onclick="sendPrompt('How do I decode raw Orca Whirlpool account data bytes manually without the SDK — what is the binary layout of the WhirlpoolData struct?')">How to decode raw pool account data ↗</button>
+</div>
+
+<!-- S3: PROFIT DETECTION -->
+<div class="gsec" id="s3" data-label="Profit detection">
+<p class="lbl">The math that decides whether to fire</p>
+<h3 class="sec-t">Calculating net profit before submitting</h3>
+<p class="sec-s">Firing on every price discrepancy loses money. You must account for every cost — swap fees on both sides, flash loan fee, Jito tip, priority fee, and slippage — before deciding to submit. The detection logic is the heart of a profitable bot.</p>
+
+<div class="code-hd hd-ts">profit-calculator.ts — exact profit math with all cost deductions</div>
+<div class="code"><span class="kw">const</span> FEE = {
+  ORCA_WHIRLPOOL_BPS:   <span class="num">4</span>,    <span class="cmt">// 0.04% (tight pool tier)</span>
+  RAYDIUM_AMM_BPS:      <span class="num">25</span>,   <span class="cmt">// 0.25%</span>
+  FLASH_LOAN_BPS:       <span class="num">0</span>,    <span class="cmt">// 0% on Marginfi flash loans</span>
+  JITO_TIP_SOL:         <span class="num">0.003</span>,<span class="cmt">// competitive Jito tip (adjust dynamically)</span>
+  PRIORITY_FEE_LAMPORTS:<span class="num">200_000</span>, <span class="cmt">// 0.0002 SOL compute unit fee</span>
+};
+
+<span class="kw">interface</span> ArbOpportunity {
+  buyDex:      <span class="str">'orca'</span> | <span class="str">'raydium'</span>; <span class="cmt">// buy SOL here (lower price)</span>
+  sellDex:     <span class="str">'orca'</span> | <span class="str">'raydium'</span>; <span class="cmt">// sell SOL here (higher price)</span>
+  buyPrice:    <span class="typ">number</span>; <span class="cmt">// USDC/SOL</span>
+  sellPrice:   <span class="typ">number</span>; <span class="cmt">// USDC/SOL</span>
+  optimalAmtSol: <span class="typ">number</span>;
+  netProfitUsdc: <span class="typ">number</span>;
+}
+
+<span class="kw">function</span> calcOptimalArb(
+  buyPool:  PoolState,
+  sellPool: PoolState,
+  solPriceUsdc: <span class="typ">number</span>
+): ArbOpportunity | <span class="kw">null</span> {
+
+  <span class="cmt">// ── Optimal trade size using constant-product formula ──
+  // For two pools with reserves (rIn_A, rOut_A) and (rIn_B, rOut_B):
+  // Optimal input = sqrt(rIn_A * rIn_B * rOut_A / rOut_B) - rIn_A
+  // (Maximizes profit accounting for price impact on both pools)</span>
+  <span class="kw">const</span> rSolBuy  = buyPool.solReserve;
+  <span class="kw">const</span> rUsdcBuy = buyPool.usdcReserve;
+  <span class="kw">const</span> rSolSell = sellPool.solReserve;
+  <span class="kw">const</span> rUsdcSell= sellPool.usdcReserve;
+
+  <span class="kw">const</span> optimalSol = Math.sqrt(
+    (rSolBuy * rUsdcBuy * rSolSell) / rUsdcSell
+  ) - rSolBuy;
+
+  <span class="kw">if</span> (optimalSol <= <span class="num">0</span> || optimalSol > <span class="num">500</span>) <span class="kw">return null</span>; <span class="cmt">// cap at 500 SOL</span>
+
+  <span class="cmt">// ── Apply swap fee on buy leg (pay USDC, receive SOL) ──</span>
+  <span class="kw">const</span> usdcIn = getAmountIn(buyPool, optimalSol, <span class="str">'USDC→SOL'</span>, FEE.ORCA_WHIRLPOOL_BPS);
+
+  <span class="cmt">// ── Apply swap fee on sell leg (pay SOL, receive USDC) ──</span>
+  <span class="kw">const</span> usdcOut= getAmountOut(sellPool, optimalSol, <span class="str">'SOL→USDC'</span>, FEE.RAYDIUM_AMM_BPS);
+
+  <span class="cmt">// ── Gross profit ──</span>
+  <span class="kw">const</span> grossProfit = usdcOut - usdcIn;
+
+  <span class="cmt">// ── Subtract fixed costs (convert all to USDC) ──</span>
+  <span class="kw">const</span> jitoTipUsdc     = FEE.JITO_TIP_SOL * solPriceUsdc;
+  <span class="kw">const</span> priorityFeeUsdc = (FEE.PRIORITY_FEE_LAMPORTS / <span class="num">1e9</span>) * solPriceUsdc;
+  <span class="kw">const</span> flashLoanFeeUsdc= usdcIn * (FEE.FLASH_LOAN_BPS / <span class="num">10000</span>);
+
+  <span class="kw">const</span> totalCost = jitoTipUsdc + priorityFeeUsdc + flashLoanFeeUsdc;
+  <span class="kw">const</span> netProfit = grossProfit - totalCost;
+
+  console.log(<span class="str">`
+  Trade size:    ${optimalSol.toFixed(4)} SOL
+  USDC in:       $${usdcIn.toFixed(4)}
+  USDC out:      $${usdcOut.toFixed(4)}
+  Gross profit:  $${grossProfit.toFixed(4)}
+  Jito tip:      $${jitoTipUsdc.toFixed(4)}
+  Priority fee:  $${priorityFeeUsdc.toFixed(4)}
+  NET PROFIT:    $${netProfit.toFixed(4)} ${netProfit > 0 ? '✅ FIRE' : '❌ SKIP'}
+  `</span>);
+
+  <span class="kw">if</span> (netProfit < <span class="num">0.50</span>) <span class="kw">return null</span>; <span class="cmt">// minimum $0.50 profit threshold</span>
+
+  <span class="kw">return</span> {
+    buyDex:        <span class="str">'orca'</span>,
+    sellDex:       <span class="str">'raydium'</span>,
+    buyPrice:      buyPool.price,
+    sellPrice:     sellPool.price,
+    optimalAmtSol: optimalSol,
+    netProfitUsdc: netProfit,
+  };
+}
+
+<span class="cmt">// x*y=k constant-product output formula with fee</span>
+<span class="kw">function</span> getAmountOut(
+  pool: PoolState,
+  amtIn: <span class="typ">number</span>,
+  direction: <span class="typ">string</span>,
+  feeBps: <span class="typ">number</span>
+): <span class="typ">number</span> {
+  <span class="kw">const</span> [rIn, rOut] = direction === <span class="str">'SOL→USDC'</span>
+    ? [pool.solReserve, pool.usdcReserve]
+    : [pool.usdcReserve, pool.solReserve];
+
+  <span class="kw">const</span> amtInWithFee = amtIn * (<span class="num">10000</span> - feeBps);
+  <span class="kw">return</span> (rOut * amtInWithFee) / (rIn * <span class="num">10000</span> + amtInWithFee);
+}</div>
+
+<div class="note"><i class="ti ti-bulb" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>Slippage simulation: in practice you should also simulate the transaction with <span class="mono">simulateTransaction()</span> before sending. This catches cases where the pool state changed between detection and submission, preventing you from losing money on a bad trade.</div>
+<button onclick="sendPrompt('How do I use Solana simulateTransaction to test my arbitrage transaction before submitting it — what does the simulation return and how do I parse the resulting token balance changes?')">Simulating transactions before submission ↗</button>
+</div>
+
+<!-- S4: ON-CHAIN PROGRAM -->
+<div class="gsec" id="s4" data-label="On-chain program">
+<p class="lbl">Rust/Anchor — the atomic arbitrage program</p>
+<h3 class="sec-t">The on-chain logic: borrow → swap → swap → repay</h3>
+<p class="sec-s">Your Anchor program executes the arbitrage atomically. If any step fails — wrong price, insufficient funds, slippage exceeded — the entire transaction reverts and you pay nothing (except the priority fee). This is the safety guarantee that makes flash loan arb low-risk.</p>
+
+<div class="code-hd hd-rs">programs/arb-bot/src/lib.rs — complete flash loan arbitrage program</div>
+<div class="code"><span class="kw">use</span> anchor_lang::prelude::*;
+<span class="kw">use</span> anchor_spl::token::{self, Token, TokenAccount, Transfer};
+<span class="cmt">// These CPI crates are generated from each protocol's IDL</span>
+<span class="kw">use</span> marginfi::cpi::accounts::{LendingPoolBorrow, LendingPoolRepay};
+<span class="kw">use</span> whirlpool::cpi::accounts::Swap <span class="kw">as</span> WhirlpoolSwap;
+<span class="kw">use</span> raydium_cp_swap::cpi::accounts::SwapBaseInput;
+
+declare_id!(<span class="str">"ArbBot11111111111111111111111111111111111111"</span>);
+
+<span class="mac">#[program]</span>
+<span class="kw">pub mod</span> arb_bot {
+    <span class="kw">use super</span>::*;
+
+    <span class="cmt">/// Single entry-point. Client calls this once; all four legs run atomically.</span>
+    <span class="kw">pub fn</span> execute_arb(
+        ctx:          Context&lt;ExecuteArb&gt;,
+        borrow_usdc:  <span class="kw">u64</span>,   <span class="cmt">// USDC to flash-borrow</span>
+        min_sol_out:  <span class="kw">u64</span>,   <span class="cmt">// slippage guard on buy leg</span>
+        min_usdc_out: <span class="kw">u64</span>,   <span class="cmt">// slippage guard on sell leg</span>
+    ) -> Result&lt;()&gt; {
+
+        <span class="cmt">// ── Snapshot balances BEFORE to verify profit at end ──</span>
+        <span class="kw">let</span> usdc_before = ctx.accounts.bot_usdc_ata.amount;
+
+        <span class="cmt">// ──────────────────────────────────────────────────
+        // LEG 1: Flash-borrow USDC from Marginfi
+        // ──────────────────────────────────────────────────</span>
+        marginfi::cpi::lending_pool_borrow(
+            CpiContext::new(
+                ctx.accounts.marginfi_program.to_account_info(),
+                LendingPoolBorrow {
+                    marginfi_group:    ctx.accounts.mfi_group.to_account_info(),
+                    marginfi_account:  ctx.accounts.mfi_account.to_account_info(),
+                    signer:            ctx.accounts.bot_authority.to_account_info(),
+                    bank:              ctx.accounts.usdc_bank.to_account_info(),
+                    destination_token: ctx.accounts.bot_usdc_ata.to_account_info(),
+                    bank_liquidity:    ctx.accounts.mfi_usdc_vault.to_account_info(),
+                    token_program:     ctx.accounts.token_program.to_account_info(),
+                },
+            ),
+            borrow_usdc,
+        )?;
+
+        <span class="cmt">// ──────────────────────────────────────────────────
+        // LEG 2: Buy SOL on Orca (USDC → SOL, lower-priced pool)
+        // ──────────────────────────────────────────────────</span>
+        whirlpool::cpi::swap(
+            CpiContext::new(
+                ctx.accounts.whirlpool_program.to_account_info(),
+                WhirlpoolSwap {
+                    token_program:       ctx.accounts.token_program.to_account_info(),
+                    token_authority:     ctx.accounts.bot_authority.to_account_info(),
+                    whirlpool:           ctx.accounts.orca_pool.to_account_info(),
+                    token_owner_account_a: ctx.accounts.bot_usdc_ata.to_account_info(),
+                    token_vault_a:       ctx.accounts.orca_usdc_vault.to_account_info(),
+                    token_owner_account_b: ctx.accounts.bot_sol_ata.to_account_info(),
+                    token_vault_b:       ctx.accounts.orca_sol_vault.to_account_info(),
+                    tick_array_0:        ctx.accounts.tick_array_0.to_account_info(),
+                    tick_array_1:        ctx.accounts.tick_array_1.to_account_info(),
+                    tick_array_2:        ctx.accounts.tick_array_2.to_account_info(),
+                    oracle:              ctx.accounts.orca_oracle.to_account_info(),
+                },
+            ),
+            borrow_usdc,  <span class="cmt">// amount in (USDC)</span>
+            min_sol_out,  <span class="cmt">// minimum SOL out (slippage guard)</span>
+            <span class="kw">true</span>,         <span class="cmt">// a_to_b: USDC→SOL</span>
+            <span class="kw">true</span>,         <span class="cmt">// amount_specified_is_input</span>
+            <span class="num">4295048016</span>,   <span class="cmt">// sqrt_price_limit (max, no limit effectively)</span>
+        )?;
+
+        <span class="cmt">// How much SOL did we get?</span>
+        ctx.accounts.bot_sol_ata.reload()?;
+        <span class="kw">let</span> sol_received = ctx.accounts.bot_sol_ata.amount;
+
+        <span class="cmt">// ──────────────────────────────────────────────────
+        // LEG 3: Sell SOL on Raydium (SOL → USDC, higher-priced pool)
+        // ──────────────────────────────────────────────────</span>
+        raydium_cp_swap::cpi::swap_base_input(
+            CpiContext::new(
+                ctx.accounts.raydium_program.to_account_info(),
+                SwapBaseInput {
+                    payer:             ctx.accounts.bot_authority.to_account_info(),
+                    authority:         ctx.accounts.raydium_authority.to_account_info(),
+                    amm_config:        ctx.accounts.amm_config.to_account_info(),
+                    pool_state:        ctx.accounts.raydium_pool.to_account_info(),
+                    input_token_account:  ctx.accounts.bot_sol_ata.to_account_info(),
+                    output_token_account: ctx.accounts.bot_usdc_ata.to_account_info(),
+                    input_vault:       ctx.accounts.raydium_sol_vault.to_account_info(),
+                    output_vault:      ctx.accounts.raydium_usdc_vault.to_account_info(),
+                    input_token_program:  ctx.accounts.token_program.to_account_info(),
+                    output_token_program: ctx.accounts.token_program.to_account_info(),
+                    input_token_mint:  ctx.accounts.sol_mint.to_account_info(),
+                    output_token_mint: ctx.accounts.usdc_mint.to_account_info(),
+                    observation_state: ctx.accounts.observation.to_account_info(),
+                },
+            ),
+            sol_received, <span class="cmt">// sell all the SOL we got</span>
+            min_usdc_out, <span class="cmt">// minimum USDC back (slippage guard)</span>
+        )?;
+
+        <span class="cmt">// ──────────────────────────────────────────────────
+        // LEG 4: Repay flash loan to Marginfi
+        // ──────────────────────────────────────────────────</span>
+        marginfi::cpi::lending_pool_repay(
+            CpiContext::new(
+                ctx.accounts.marginfi_program.to_account_info(),
+                LendingPoolRepay {
+                    marginfi_group:   ctx.accounts.mfi_group.to_account_info(),
+                    marginfi_account: ctx.accounts.mfi_account.to_account_info(),
+                    signer:           ctx.accounts.bot_authority.to_account_info(),
+                    bank:             ctx.accounts.usdc_bank.to_account_info(),
+                    signer_token:     ctx.accounts.bot_usdc_ata.to_account_info(),
+                    bank_liquidity:   ctx.accounts.mfi_usdc_vault.to_account_info(),
+                    token_program:    ctx.accounts.token_program.to_account_info(),
+                },
+            ),
+            <span class="kw">None</span>, <span class="cmt">// None = repay entire borrow (principal + any interest)</span>
+        )?;
+
+        <span class="cmt">// ──────────────────────────────────────────────────
+        // SANITY CHECK: verify we actually profited
+        // ──────────────────────────────────────────────────</span>
+        ctx.accounts.bot_usdc_ata.reload()?;
+        <span class="kw">let</span> usdc_after = ctx.accounts.bot_usdc_ata.amount;
+        require!(
+            usdc_after > usdc_before,
+            ArbError::NotProfitable
+        );
+
+        <span class="kw">let</span> profit = usdc_after - usdc_before;
+        emit!(ArbExecuted {
+            profit_usdc: profit,
+            borrow_usdc,
+            slot: Clock::get()?.slot,
+        });
+        msg!(<span class="str">"Arb complete. Profit: {} USDC lamports"</span>, profit);
+        Ok(())
+    }
+}
+
+<span class="mac">#[event]</span>
+<span class="kw">pub struct</span> ArbExecuted {
+    <span class="kw">pub</span> profit_usdc: <span class="kw">u64</span>,
+    <span class="kw">pub</span> borrow_usdc: <span class="kw">u64</span>,
+    <span class="kw">pub</span> slot:        <span class="kw">u64</span>,
+}
+
+<span class="mac">#[error_code]</span>
+<span class="kw">pub enum</span> ArbError {
+    <span class="mac">#[msg("Transaction did not result in profit — reverting")]</span>
+    NotProfitable,
+    <span class="mac">#[msg("Slippage exceeded minimum output amount")]</span>
+    SlippageExceeded,
+}</div>
+<button onclick="sendPrompt('How do Cross-Program Invocations work in Anchor — what is CpiContext vs CpiContext::new_with_signer, and when do I need to use PDA signing for CPIs?')">Understanding CPI and PDA signing ↗</button>
+</div>
+
+<!-- S5: TRANSACTION BUILDING -->
+<div class="gsec" id="s5" data-label="Transaction building">
+<p class="lbl">Constructing the optimal transaction</p>
+<h3 class="sec-t">Versioned transactions, compute budget, and lookup tables</h3>
+<p class="sec-s">A flash loan arb transaction touches many accounts — flash loan program, two DEX programs, multiple vaults, tick arrays, oracles. This pushes past Solana's 32-account limit for legacy transactions. Versioned transactions with Address Lookup Tables solve this and also reduce transaction size, lowering fees.</p>
+
+<div class="code-hd hd-ts">tx-builder.ts — construct the full arbitrage transaction</div>
+<div class="code"><span class="kw">import</span> {
+  Connection, PublicKey, Keypair,
+  TransactionMessage, VersionedTransaction,
+  AddressLookupTableAccount, ComputeBudgetProgram,
+  LAMPORTS_PER_SOL
+} <span class="kw">from</span> <span class="str">'@solana/web3.js'</span>;
+<span class="kw">import</span> { Program, BN } <span class="kw">from</span> <span class="str">'@coral-xyz/anchor'</span>;
+
+<span class="kw">async function</span> buildArbTx(
+  conn:        Connection,
+  botKeypair:  Keypair,
+  program:     Program,          <span class="cmt">// your anchor arb-bot program</span>
+  opp:         ArbOpportunity,
+  priorityCuPrice: <span class="typ">number</span>,      <span class="cmt">// lamports per compute unit</span>
+  jitoTipLamports: <span class="typ">number</span>,      <span class="cmt">// Jito tip amount</span>
+  altAccounts: AddressLookupTableAccount[] <span class="cmt">// pre-loaded lookup tables</span>
+): Promise&lt;VersionedTransaction&gt; {
+
+  <span class="cmt">// ── Instruction 0: set compute unit limit (prevents runaway compute) ──</span>
+  <span class="kw">const</span> setCuLimit = ComputeBudgetProgram.setComputeUnitLimit({
+    units: <span class="num">400_000</span>, <span class="cmt">// flash loan arb uses ~280k CUs; set headroom</span>
+  });
+
+  <span class="cmt">// ── Instruction 1: set priority fee (compete for block inclusion) ──</span>
+  <span class="kw">const</span> setCuPrice = ComputeBudgetProgram.setComputeUnitPrice({
+    microLamports: priorityCuPrice, <span class="cmt">// e.g. 50_000 = 0.00005 SOL per 1M CUs</span>
+  });
+
+  <span class="cmt">// ── Instruction 2: Jito tip — send SOL to a Jito tip account ──</span>
+  <span class="kw">const</span> JITO_TIP_ACCOUNTS = [
+    <span class="kw">new</span> PublicKey(<span class="str">'96gYZGLnJYVFmbjzopPSU6QiEV5fGqZNyN9nmNhvrZU5'</span>),
+    <span class="kw">new</span> PublicKey(<span class="str">'HFqU5x63VTqvQss8hp11i4wVV8bD44PvwucfZ2bU7gRe'</span>),
+    <span class="cmt">// ... 8 Jito tip accounts (pick one randomly)</span>
+  ];
+  <span class="kw">const</span> tipAccount = JITO_TIP_ACCOUNTS[Math.floor(Math.random() * JITO_TIP_ACCOUNTS.length)];
+  <span class="kw">const</span> jitoTipIx = SystemProgram.transfer({
+    fromPubkey: botKeypair.publicKey,
+    toPubkey:   tipAccount,
+    lamports:   jitoTipLamports,
+  });
+
+  <span class="cmt">// ── Instruction 3: the actual arb (your on-chain program) ──</span>
+  <span class="kw">const</span> borrowUsdc  = <span class="kw">new</span> BN(opp.optimalAmtUsdc * <span class="num">1e6</span>); <span class="cmt">// USDC has 6 decimals</span>
+  <span class="kw">const</span> minSolOut   = <span class="kw">new</span> BN(opp.minSolOut   * <span class="num">1e9</span>).muln(<span class="num">995</span>).divn(<span class="num">1000</span>); <span class="cmt">// 0.5% slippage</span>
+  <span class="kw">const</span> minUsdcOut  = <span class="kw">new</span> BN(opp.minUsdcOut  * <span class="num">1e6</span>).muln(<span class="num">995</span>).divn(<span class="num">1000</span>);
+
+  <span class="kw">const</span> arbIx = <span class="kw">await</span> program.methods
+    .executeArb(borrowUsdc, minSolOut, minUsdcOut)
+    .accounts({
+      botAuthority:    botKeypair.publicKey,
+      botUsdcAta:      opp.botUsdcAta,
+      botSolAta:       opp.botSolAta,
+      <span class="cmt">// --- Marginfi accounts ---</span>
+      marginfiProgram: MARGINFI_PROGRAM_ID,
+      mfiGroup:        opp.mfiGroup,
+      mfiAccount:      opp.mfiAccount,
+      usdcBank:        opp.usdcBank,
+      mfiUsdcVault:    opp.mfiUsdcVault,
+      <span class="cmt">// --- Orca Whirlpool accounts ---</span>
+      whirlpoolProgram:WHIRLPOOL_PROGRAM_ID,
+      orcaPool:        opp.orcaPool,
+      orcaUsdcVault:   opp.orcaUsdcVault,
+      orcaSolVault:    opp.orcaSolVault,
+      tickArray0:      opp.tickArray0,
+      tickArray1:      opp.tickArray1,
+      tickArray2:      opp.tickArray2,
+      orcaOracle:      opp.orcaOracle,
+      <span class="cmt">// --- Raydium accounts ---</span>
+      raydiumProgram:  RAYDIUM_PROGRAM_ID,
+      raydiumPool:     opp.raydiumPool,
+      raydiumSolVault: opp.raydiumSolVault,
+      raydiumUsdcVault:opp.raydiumUsdcVault,
+      ammConfig:       opp.ammConfig,
+      observation:     opp.observation,
+      tokenProgram:    TOKEN_PROGRAM_ID,
+      solMint:         WSOL_MINT,
+      usdcMint:        USDC_MINT,
+    })
+    .instruction();
+
+  <span class="cmt">// ── Build versioned transaction (v0) with lookup tables ──
+  // Without ALTs, this tx has ~30 accounts → exceeds legacy 32-key limit
+  // ALTs compress them to short 1-byte indices, enabling up to 256 accounts</span>
+  <span class="kw">const</span> { blockhash } = <span class="kw">await</span> conn.getLatestBlockhash(<span class="str">'processed'</span>);
+
+  <span class="kw">const</span> msg = <span class="kw">new</span> TransactionMessage({
+    payerKey:   botKeypair.publicKey,
+    recentBlockhash: blockhash,
+    instructions: [setCuLimit, setCuPrice, jitoTipIx, arbIx],
+  }).compileToV0Message(altAccounts); <span class="cmt">// pass ALTs here → accounts compressed</span>
+
+  <span class="kw">const</span> tx = <span class="kw">new</span> VersionedTransaction(msg);
+  tx.sign([botKeypair]);
+  <span class="kw">return</span> tx;
+}
+
+<span class="cmt">// ── Pre-load Address Lookup Tables once at startup (not per-opportunity) ──</span>
+<span class="kw">async function</span> loadALTs(conn: Connection): Promise&lt;AddressLookupTableAccount[]&gt; {
+  <span class="cmt">// Your ALT stores all static accounts (vaults, tick arrays, oracle, etc.)
+  // so the tx body only needs 1-byte indices instead of 32-byte pubkeys</span>
+  <span class="kw">const</span> ALT_ADDRESS = <span class="kw">new</span> PublicKey(<span class="str">'YourLookupTableAddress...'</span>);
+  <span class="kw">const</span> resp = <span class="kw">await</span> conn.getAddressLookupTable(ALT_ADDRESS);
+  <span class="kw">return</span> resp.value ? [resp.value] : [];
+}</div>
+
+<div class="code-hd hd-ts" style="margin-top:-.5rem">Creating your Address Lookup Table (one-time setup)</div>
+<div class="code"><span class="cmt">// Run once before your bot goes live.
+// Add all static pool accounts to an ALT → tx becomes much smaller.</span>
+<span class="kw">async function</span> createALT(conn: Connection, payer: Keypair, accounts: PublicKey[]) {
+  <span class="kw">const</span> slot = <span class="kw">await</span> conn.getSlot();
+
+  <span class="cmt">// Create the lookup table</span>
+  <span class="kw">const</span> [createIx, altAddress] = AddressLookupTableProgram.createLookupTable({
+    authority: payer.publicKey,
+    payer:     payer.publicKey,
+    recentSlot: slot - <span class="num">1</span>,
+  });
+
+  <span class="cmt">// Add accounts to it</span>
+  <span class="kw">const</span> extendIx = AddressLookupTableProgram.extendLookupTable({
+    payer:        payer.publicKey,
+    authority:    payer.publicKey,
+    lookupTable:  altAddress,
+    addresses:    accounts, <span class="cmt">// all your pool/vault/oracle accounts</span>
+  });
+
+  <span class="cmt">// Submit — ALT is active after ~1 slot</span>
+  <span class="kw">const</span> { blockhash } = <span class="kw">await</span> conn.getLatestBlockhash();
+  <span class="kw">const</span> msg = <span class="kw">new</span> TransactionMessage({
+    payerKey: payer.publicKey, recentBlockhash: blockhash,
+    instructions: [createIx, extendIx]
+  }).compileToV0Message();
+  <span class="kw">const</span> tx = <span class="kw">new</span> VersionedTransaction(msg);
+  tx.sign([payer]);
+  <span class="kw">await</span> conn.sendTransaction(tx, {skipPreflight: <span class="kw">false</span>});
+  console.log(<span class="str">`ALT created: ${altAddress.toBase58()}`</span>);
+}</div>
+<button onclick="sendPrompt('How do I create and manage Solana Address Lookup Tables for a production bot — what accounts should I put in them, how many can I fit, and how do I handle ALT account updates when pools change?')">Managing Address Lookup Tables in production ↗</button>
+</div>
+
+<!-- S6: MEV SUBMISSION -->
+<div class="gsec" id="s6" data-label="MEV and submission">
+<p class="lbl">Winning block inclusion — the final mile</p>
+<h3 class="sec-t">Jito bundles, priority fees, and latency</h3>
+<p class="sec-s">Detection and construction mean nothing if another bot lands their transaction first. Jito's block engine lets you submit bundles with guaranteed ordering. Tip auctions are ruthless — your tip must exceed competitors' or your bundle is skipped. Here's how to win.</p>
+
+<div class="code-hd hd-ts">submitter.ts — Jito bundle submission with dynamic tip bidding</div>
+<div class="code"><span class="kw">import</span> {
+  searcherClient, Bundle
+} <span class="kw">from</span> <span class="str">'jito-ts/dist/sdk/block-engine/searcher'</span>;
+<span class="kw">import</span> { isError } <span class="kw">from</span> <span class="str">'jito-ts/dist/sdk/block-engine/utils'</span>;
+
+<span class="kw">const</span> JITO_BLOCK_ENGINE_URL = <span class="str">'mainnet.block-engine.jito.wtf:443'</span>;
+
+<span class="kw">class</span> ArbSubmitter {
+  <span class="kw">private</span> searcher: <span class="kw">any</span>;
+  <span class="kw">private</span> tipHistory: <span class="typ">number</span>[] = []; <span class="cmt">// track winning tips to calibrate</span>
+
+  <span class="kw">async</span> connect(authKeypair: Keypair) {
+    <span class="kw">this</span>.searcher = <span class="kw">await</span> searcherClient(
+      JITO_BLOCK_ENGINE_URL,
+      authKeypair  <span class="cmt">// searcher identity for rate limits</span>
+    );
+
+    <span class="cmt">// Subscribe to bundle outcomes — learn what tips are winning</span>
+    <span class="kw">this</span>.searcher.onBundleResult(
+      (result: <span class="kw">any</span>) => {
+        <span class="kw">if</span> (result.accepted)   console.log(<span class="str">'✅ Bundle accepted, slot:'</span>, result.accepted.slot);
+        <span class="kw">if</span> (result.rejected)   console.log(<span class="str">'❌ Bundle rejected:'</span>, result.rejected.stateAuctionBidRejected?.msg);
+        <span class="kw">if</span> (result.droppedBundle) console.log(<span class="str">'⚠️  Bundle dropped (slot missed)'</span>);
+      },
+      (err: Error) => console.error(<span class="str">'Bundle stream error:'</span>, err)
+    );
+  }
+
+  <span class="kw">async</span> submit(
+    arbTx:       VersionedTransaction,
+    profitUsdc:  <span class="typ">number</span>,
+    solPriceUsdc:<span class="typ">number</span>
+  ): Promise&lt;<span class="typ">boolean</span>&gt; {
+
+    <span class="cmt">// ── Dynamic tip: bid 60% of profit, minimum 0.001 SOL ──
+    // If profit is $5 and SOL = $150, tip up to ~0.02 SOL
+    // Adjust based on competition — track rejected bundles</span>
+    <span class="kw">const</span> profitSol   = profitUsdc / solPriceUsdc;
+    <span class="kw">const</span> targetTip   = Math.max(profitSol * <span class="num">0.6</span>, <span class="num">0.001</span>);
+    <span class="kw">const</span> tipLamports = Math.floor(targetTip * LAMPORTS_PER_SOL);
+
+    <span class="kw">const</span> bundle = <span class="kw">new</span> Bundle([arbTx], <span class="num">5</span> <span class="cmt">/* max txs in bundle */</span>);
+
+    <span class="kw">try</span> {
+      <span class="kw">const</span> resp = <span class="kw">await</span> <span class="kw">this</span>.searcher.sendBundle(bundle);
+      <span class="kw">if</span> (isError(resp)) {
+        console.error(<span class="str">'Bundle error:'</span>, resp);
+        <span class="kw">return false</span>;
+      }
+      console.log(<span class="str">`Bundle sent: ${resp}  tip: ${(tipLamports/LAMPORTS_PER_SOL).toFixed(5)} SOL`</span>);
+      <span class="kw">return true</span>;
+    } <span class="kw">catch</span> (e) {
+      console.error(<span class="str">'Send failed:'</span>, e);
+      <span class="kw">return false</span>;
+    }
+  }
+}
+
+<span class="cmt">// ── Parallel broadcast: send to Jito AND regular RPCs simultaneously ──
+// If Jito leader isn't the next slot, regular broadcast wins.
+// Belt-and-suspenders approach used by most production bots.</span>
+<span class="kw">async function</span> broadcastParallel(
+  tx:       VersionedTransaction,
+  conn:     Connection,
+  submitter:ArbSubmitter,
+  profitUsdc:<span class="typ">number</span>,
+  solPrice: <span class="typ">number</span>
+) {
+  <span class="kw">const</span> rawTx = tx.serialize();
+
+  <span class="kw">await</span> Promise.allSettled([
+    <span class="cmt">// Path A: Jito bundle (guaranteed ordering, MEV protection)</span>
+    submitter.submit(tx, profitUsdc, solPrice),
+
+    <span class="cmt">// Path B: Primary RPC (low-latency connection)</span>
+    conn.sendRawTransaction(rawTx, {
+      skipPreflight: <span class="kw">true</span>,  <span class="cmt">// don't simulate — already did that</span>
+      maxRetries:    <span class="num">0</span>,     <span class="cmt">// no auto-retry — stale by the time it's retried</span>
+    }),
+
+    <span class="cmt">// Path C: Secondary RPC for coverage</span>
+    backupConn.sendRawTransaction(rawTx, { skipPreflight: <span class="kw">true</span>, maxRetries: <span class="num">0</span> }),
+  ]);
+}</div>
+
+<p class="lbl">Latency optimization checklist</p>
+<div class="g3">
+  <div class="card ac">
+    <i class="ti ti-server" aria-hidden="true" style="font-size:20px;color:var(--text-accent);margin-bottom:8px"></i>
+    <p class="ct">Infrastructure</p>
+    <p class="cb">Bare-metal server in the same datacenter as major validators (Frankfurt, Amsterdam, Tokyo, Ashburn). Each 10ms of round-trip time costs you roughly 2.5% of the slot window.</p>
+  </div>
+  <div class="card">
+    <i class="ti ti-network" aria-hidden="true" style="font-size:20px;color:var(--text-pro);margin-bottom:8px"></i>
+    <p class="ct">RPC choice</p>
+    <p class="cb">Use <strong style="font-weight:500">Triton RPC</strong>, <strong style="font-weight:500">Helius</strong>, or <strong style="font-weight:500">QuickNode</strong> for dedicated nodes. Never use the public mainnet-beta.solana.com endpoint — it's rate-limited and slow.</p>
+  </div>
+  <div class="card">
+    <i class="ti ti-stack" aria-hidden="true" style="font-size:20px;color:var(--text-warning);margin-bottom:8px"></i>
+    <p class="ct">Pre-build transactions</p>
+    <p class="cb">Pre-sign partial transactions (everything except blockhash) at startup. On opportunity, only update the blockhash and slippage params — saves 10–30ms of construction time.</p>
+  </div>
+  <div class="card">
+    <i class="ti ti-code" aria-hidden="true" style="font-size:20px;color:var(--text-success);margin-bottom:8px"></i>
+    <p class="ct">Write detection in Rust</p>
+    <p class="cb">TypeScript adds 5–20ms overhead vs native Rust for pool decoding and profit math. Production bots use Rust for the hot path and TypeScript only for config and monitoring.</p>
+  </div>
+  <div class="card">
+    <i class="ti ti-currency-bitcoin" aria-hidden="true" style="font-size:20px;color:var(--text-accent);margin-bottom:8px"></i>
+    <p class="ct">Tip auction strategy</p>
+    <p class="cb">Start with 50–60% of expected profit as Jito tip. Track rejection reasons. Increase tip if frequently rejected on high-profit opportunities. Decrease if winning easily.</p>
+  </div>
+  <div class="card pc">
+    <i class="ti ti-shield" aria-hidden="true" style="font-size:20px;color:var(--text-pro);margin-bottom:8px"></i>
+    <p class="ct">Always simulate first</p>
+    <p class="cb">Call <span class="mono">simulateTransaction()</span> with <span class="mono">replaceRecentBlockhash: true</span> before every live submission. A failed on-chain tx still costs priority fees + Jito tip.</p>
+  </div>
+</div>
+
+<div class="good"><i class="ti ti-bulb" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>The most profitable strategy today is not raw cross-DEX arbitrage (extremely competitive) but rather finding and exploiting price inefficiencies in newly-launched token pools, low-liquidity long-tail pairs, or cross-chain price divergences (Solana vs EVM via Wormhole prices) — areas where fewer bots are looking.</div>
+<button onclick="sendPrompt('What are the most profitable and least competitive arbitrage opportunities on Solana in 2025 — beyond the obvious SOL-USDC pool pairs that every bot already watches?')">Less competitive arb opportunities on Solana ↗</button>
+</div>
+
+</div>
+
+<script>
+(function(){
+  var nav=document.getElementById('gnav');
+  var secs=document.querySelectorAll('.gsec');
+  function show(id){
+    secs.forEach(function(s){s.style.display='none';});
+    document.getElementById(id).style.display='block';
+    nav.querySelectorAll('.gtab').forEach(function(b){b.classList.remove('active');});
+    nav.querySelector('[data-t="'+id+'"]').classList.add('active');
+  }
+  secs.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.className='gtab'+(i===0?' active':'');
+    b.dataset.t=s.id;
+    b.textContent=s.dataset.label;
+    b.onclick=function(){show(s.id);};
+    nav.appendChild(b);
+    if(i>0)s.style.display='none';
+  });
+  nav.style.display='flex';
+})();
+</script>

@@ -1,0 +1,329 @@
+
+<h2 class="sr-only">Ultimate guide to Web3, blockchain, smart contracts, DeFi, NFTs, DAOs, and wallets.</h2>
+<style>
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.gw{padding:.5rem 0 2rem}
+#gnav{display:none;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:.5px solid var(--border)}
+.gtab{padding:5px 13px;border-radius:var(--radius);border:.5px solid var(--border);background:transparent;color:var(--text-secondary);font-size:13px;cursor:pointer}
+.gtab:hover,.gtab.active{background:var(--surface-1);color:var(--text-primary);border-color:var(--border-strong)}
+.gtab.active{font-weight:500}
+.lbl{font-size:11px;color:var(--text-muted);font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin:0 0 10px}
+.sec-t{font-size:20px;font-weight:500;color:var(--text-primary);margin:4px 0 5px}
+.sec-s{font-size:13px;color:var(--text-secondary);margin:0 0 1.5rem;line-height:1.65}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-bottom:1.5rem}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(178px,1fr));gap:12px;margin-bottom:1.5rem}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:12px;margin-bottom:1.5rem}
+.card{background:var(--surface-1);border:.5px solid var(--border);border-radius:12px;padding:1rem 1.2rem}
+.ct{font-size:13px;font-weight:500;color:var(--text-primary);margin:0 0 5px}
+.cb{font-size:13px;color:var(--text-secondary);margin:0;line-height:1.5}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;margin-right:4px;margin-bottom:4px}
+.ba{background:var(--bg-accent);color:var(--text-accent)}
+.bg-s{background:var(--bg-success);color:var(--text-success)}
+.bw{background:var(--bg-warning);color:var(--text-warning)}
+.bd{background:var(--bg-danger);color:var(--text-danger)}
+.bp{background:var(--bg-pro);color:var(--text-pro)}
+.bn{background:var(--surface-0);color:var(--text-secondary);border:.5px solid var(--border)}
+.div{border:none;border-top:.5px solid var(--border);margin:1.5rem 0}
+.code{background:var(--surface-0);border:.5px solid var(--border);border-radius:var(--radius);padding:1rem;font-family:var(--font-mono);font-size:11.5px;color:var(--text-primary);line-height:1.7;overflow-x:auto;margin-bottom:1rem;white-space:pre}
+.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px;margin-bottom:1.5rem}
+.sc{background:var(--surface-1);border-radius:var(--radius);padding:.75rem 1rem}
+.sl{font-size:11px;color:var(--text-muted);margin:0 0 2px}
+.sv{font-size:20px;font-weight:500;color:var(--text-primary);margin:0}
+.ico{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chain-row{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding-bottom:8px;margin-bottom:1.5rem}
+.blk{background:var(--surface-2);border:.5px solid var(--border-strong);border-radius:var(--radius);padding:10px 12px;min-width:130px;flex-shrink:0}
+.blk-n{font-size:11px;font-weight:500;color:var(--text-accent);margin-bottom:4px}
+.blk-d{font-size:11px;color:var(--text-secondary);margin:3px 0}
+.blk-h{font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted);word-break:break-all}
+.arr{color:var(--text-muted);font-size:18px;margin:0 4px;flex-shrink:0;display:flex;align-items:center}
+.cmp{display:grid;gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem}
+.cc{background:var(--surface-1);padding:.7rem 1rem}
+.cc0{background:var(--surface-0);padding:.7rem 1rem}
+.ch{font-size:12px;font-weight:500;color:var(--text-primary);margin-bottom:.5rem}
+.cr{font-size:12px;color:var(--text-secondary);padding:3px 0;border-top:.5px solid var(--border)}
+.flow{display:flex;align-items:flex-start;gap:5px;margin:1rem 0 1.5rem;overflow-x:auto;padding-bottom:4px}
+.fs{background:var(--surface-2);border:.5px solid var(--border);border-radius:var(--radius);padding:8px 10px;font-size:12px;min-width:100px;flex:1;flex-shrink:0}
+.fs-t{font-size:11px;font-weight:500;color:var(--text-primary);margin-bottom:3px}
+.fs-b{font-size:11px;color:var(--text-secondary);line-height:1.4}
+.fa{color:var(--text-muted);font-size:14px;flex-shrink:0;padding-top:8px}
+.tl{position:relative;padding-left:2rem;margin-bottom:1.5rem}
+.tl::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:.5px;background:var(--border-strong)}
+.tl-i{position:relative;margin-bottom:1.2rem}
+.tl-d{position:absolute;left:-1.7rem;top:2px;width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500}
+.tl-t{font-size:13px;font-weight:500;color:var(--text-primary);margin:0 0 2px}
+.tl-b{font-size:12px;color:var(--text-secondary);margin:0;line-height:1.5}
+table.t{width:100%;font-size:12px;border-collapse:collapse}
+table.t th{text-align:left;padding:8px 10px;color:var(--text-secondary);font-weight:500;border-bottom:.5px solid var(--border)}
+table.t td{padding:7px 10px;color:var(--text-secondary);border-bottom:.5px solid var(--border)}
+table.t tr:nth-child(even) td{background:var(--surface-0)}
+.ac{border-color:var(--border-accent)!important}
+.sc2{border-color:var(--border-success)!important}
+.dc{border-color:var(--border-danger)!important}
+.wc{border-color:var(--border-warning)!important}
+.pc{border-color:var(--border-pro)!important}
+</style>
+<div class="gw">
+<div id="gnav"></div>
+
+<!-- S1: WEB3 -->
+<div class="gsec" id="s1" data-label="Web3">
+<p class="lbl">The internet's evolution</p>
+<h3 class="sec-t">What is Web3?</h3>
+<p class="sec-s">Web3 is the next phase of the internet — built on public blockchains, giving users cryptographic ownership of data and digital assets rather than platforms owning them.</p>
+<p class="lbl">Web1 → Web2 → Web3</p>
+<div class="cmp" style="grid-template-columns:1.3fr 1fr 1fr 1fr">
+  <div class="cc0"><div class="ch">Property</div><div class="cr">Mode</div><div class="cr">Ownership</div><div class="cr">Control</div><div class="cr">Payments</div><div class="cr">Trust model</div><div class="cr">Identity</div></div>
+  <div class="cc"><div class="ch">Web1 <span style="font-weight:400;color:var(--text-muted)">1990–2004</span></div><div class="cr">Read-only</div><div class="cr">Individuals</div><div class="cr">Decentralized</div><div class="cr">Not native</div><div class="cr">Server trust</div><div class="cr">Email / name</div></div>
+  <div class="cc" style="border-left:2px solid var(--border-accent)"><div class="ch" style="color:var(--text-accent)">Web2 <span style="font-weight:400;color:var(--text-muted)">2004–now</span></div><div class="cr">Read + Write</div><div class="cr">Corporations</div><div class="cr">Centralized</div><div class="cr">Cards / fiat</div><div class="cr">Platform trust</div><div class="cr">Username / OAuth</div></div>
+  <div class="cc" style="border-left:2px solid var(--border-success)"><div class="ch" style="color:var(--text-success)">Web3 <span style="font-weight:400;color:var(--text-muted)">emerging</span></div><div class="cr">Read + Write + Own</div><div class="cr">Users</div><div class="cr">Decentralized</div><div class="cr">Crypto-native</div><div class="cr">Trustless code</div><div class="cr">Wallet address</div></div>
+</div>
+<p class="lbl">Core pillars</p>
+<div class="g4">
+  <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div class="ico" style="background:var(--bg-accent)"><i class="ti ti-topology-ring" style="color:var(--text-accent);font-size:16px" aria-hidden="true"></i></div><span class="ct">Decentralized</span></div><p class="cb">No single entity controls the network. Data is replicated across thousands of independent nodes globally.</p></div>
+  <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div class="ico" style="background:var(--bg-success)"><i class="ti ti-lock-open" style="color:var(--text-success);font-size:16px" aria-hidden="true"></i></div><span class="ct">Permissionless</span></div><p class="cb">Anyone can participate without approval from a central authority — no sign-ups, no gatekeepers.</p></div>
+  <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div class="ico" style="background:var(--bg-warning)"><i class="ti ti-math" style="color:var(--text-warning);font-size:16px" aria-hidden="true"></i></div><span class="ct">Trustless</span></div><p class="cb">Smart contracts enforce rules via cryptographic math — no need to trust a company or institution.</p></div>
+  <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div class="ico" style="background:var(--bg-pro)"><i class="ti ti-shield-check" style="color:var(--text-pro);font-size:16px" aria-hidden="true"></i></div><span class="ct">Self-sovereign</span></div><p class="cb">You own your identity and digital assets through cryptographic keys — not a company's password policy.</p></div>
+</div>
+<p class="lbl">Key ecosystem layers</p>
+<div class="g2">
+  <div class="card"><p class="ct"><i class="ti ti-link" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>Blockchains (L1 / L2)</p><p class="cb">The foundational layer — immutable distributed ledgers. Ethereum, Solana, Avalanche, Polygon, Arbitrum, Base.</p></div>
+  <div class="card"><p class="ct"><i class="ti ti-file-code" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>Smart contracts</p><p class="cb">Self-executing programs on-chain. The logic layer powering every dApp, DeFi protocol, NFT, and DAO.</p></div>
+  <div class="card"><p class="ct"><i class="ti ti-wallet" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>Wallets</p><p class="cb">Your on-chain identity. Cryptographic keys controlling all your assets across any blockchain.</p></div>
+  <div class="card"><p class="ct"><i class="ti ti-apps" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>dApps</p><p class="cb">Decentralized applications with familiar UIs but trustless backends — no company can shut them down.</p></div>
+</div>
+<button onclick="sendPrompt('Give me real-world examples of Web3 vs Web2 ownership differences, and how dApps differ from regular apps')">Explore Web3 vs Web2 with real examples ↗</button>
+</div>
+
+<!-- S2: BLOCKCHAIN -->
+<div class="gsec" id="s2" data-label="Blockchain">
+<p class="lbl">The foundational layer</p>
+<h3 class="sec-t">How blockchain works</h3>
+<p class="sec-s">A distributed ledger — an ordered chain of cryptographically linked blocks, simultaneously replicated across thousands of independent nodes worldwide.</p>
+<p class="lbl">Anatomy of a blockchain</p>
+<div class="chain-row">
+  <div class="blk" style="background:var(--bg-success);border-color:var(--border-success)"><div class="blk-n" style="color:var(--text-success)">Block #1 — genesis</div><div class="blk-d">Alice → Bob: 1 ETH</div><div class="blk-h" style="margin-top:4px">Prev: 0x0000…0000</div><div class="blk-h">Hash: 0xa1b2…c3d4</div></div>
+  <div class="arr"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="blk"><div class="blk-n">Block #2</div><div class="blk-d">Bob → Carol: 0.5 ETH</div><div class="blk-h" style="margin-top:4px">Prev: 0xa1b2…c3d4</div><div class="blk-h">Hash: 0xe5f6…g7h8</div></div>
+  <div class="arr"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="blk"><div class="blk-n">Block #3</div><div class="blk-d">Carol → Dave: 2 ETH</div><div class="blk-h" style="margin-top:4px">Prev: 0xe5f6…g7h8</div><div class="blk-h">Hash: 0xi9j0…k1l2</div></div>
+  <div class="arr"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="blk" style="opacity:.4;border-style:dashed"><div class="blk-n">Block #4 — pending</div><div class="blk-d">New transactions…</div><div class="blk-h" style="margin-top:4px">Prev: 0xi9j0…k1l2</div><div class="blk-h">Hash: computing…</div></div>
+</div>
+<p style="font-size:12px;color:var(--text-muted);margin:-1rem 0 1.5rem">Changing block #2 alters its hash → invalidates block #3's "Prev" pointer → cascades through the entire chain. Tampering is computationally infeasible at scale.</p>
+<p class="lbl">Four defining properties</p>
+<div class="g2">
+  <div class="card"><div style="display:flex;gap:10px"><div class="ico" style="background:var(--bg-accent);flex-shrink:0"><i class="ti ti-lock" style="color:var(--text-accent);font-size:16px" aria-hidden="true"></i></div><div><p class="ct">Immutability</p><p class="cb">Written records cannot be changed without rewriting all subsequent blocks — requiring more computation than the entire honest network has produced.</p></div></div></div>
+  <div class="card"><div style="display:flex;gap:10px"><div class="ico" style="background:var(--bg-success);flex-shrink:0"><i class="ti ti-topology-star-3" style="color:var(--text-success);font-size:16px" aria-hidden="true"></i></div><div><p class="ct">Decentralization</p><p class="cb">Thousands of nodes each hold a complete ledger copy. No single server to hack, censor, or shut down — the network is the server.</p></div></div></div>
+  <div class="card"><div style="display:flex;gap:10px"><div class="ico" style="background:var(--bg-warning);flex-shrink:0"><i class="ti ti-eye" style="color:var(--text-warning);font-size:16px" aria-hidden="true"></i></div><div><p class="ct">Transparency</p><p class="cb">All transactions are permanently public. Block explorers like Etherscan let anyone inspect every transaction and smart contract interaction ever made.</p></div></div></div>
+  <div class="card"><div style="display:flex;gap:10px"><div class="ico" style="background:var(--bg-pro);flex-shrink:0"><i class="ti ti-user-check" style="color:var(--text-pro);font-size:16px" aria-hidden="true"></i></div><div><p class="ct">Pseudonymity</p><p class="cb">Transactions reference wallet addresses, not real names. Addresses are fully traceable on-chain but not directly linked to identity by default.</p></div></div></div>
+</div>
+<div class="div"></div>
+<p class="lbl">Consensus mechanisms</p>
+<div class="g3">
+  <div class="card"><span class="badge bw" style="margin-bottom:8px">Proof of Work</span><p class="ct">PoW</p><p class="cb">Miners race to solve SHA-256 puzzles. First to solve adds the block and earns the reward. Extremely secure but energy-intensive.</p><p style="font-size:11px;color:var(--text-muted);margin:8px 0 0;padding-top:8px;border-top:.5px solid var(--border)">Bitcoin · Litecoin · Monero</p></div>
+  <div class="card ac"><span class="badge ba" style="margin-bottom:8px">Proof of Stake</span><p class="ct">PoS</p><p class="cb">Validators lock tokens as collateral. Selected to propose blocks proportional to stake. ~99.95% less energy than PoW.</p><p style="font-size:11px;color:var(--text-muted);margin:8px 0 0;padding-top:8px;border-top:.5px solid var(--border)">Ethereum · Cardano · Solana</p></div>
+  <div class="card"><span class="badge bg-s" style="margin-bottom:8px">Delegated PoS</span><p class="ct">DPoS</p><p class="cb">Token holders elect a small delegate set who validate on their behalf. More efficient but fewer validators means less decentralization.</p><p style="font-size:11px;color:var(--text-muted);margin:8px 0 0;padding-top:8px;border-top:.5px solid var(--border)">EOS · TRON · BNB Chain</p></div>
+</div>
+<div class="div"></div>
+<p class="lbl">Major chains compared</p>
+<div style="overflow-x:auto"><table class="t"><thead><tr><th style="width:15%">Chain</th><th>Consensus</th><th>TPS</th><th>Launched</th><th>Known for</th></tr></thead><tbody>
+<tr><td style="font-weight:500;color:var(--text-accent)">Bitcoin</td><td>PoW</td><td>~7</td><td>2009</td><td>Digital gold, store of value, UTXO model</td></tr>
+<tr><td style="font-weight:500;color:var(--text-accent)">Ethereum</td><td>PoS (since 2022)</td><td>15–30</td><td>2015</td><td>Smart contracts, DeFi, NFTs, largest dev ecosystem</td></tr>
+<tr><td style="font-weight:500;color:var(--text-accent)">Solana</td><td>PoS + PoH</td><td>~65,000</td><td>2020</td><td>High throughput, low fees, gaming, DePIN</td></tr>
+<tr><td style="font-weight:500;color:var(--text-accent)">Polygon</td><td>PoS + zkEVM</td><td>~7,000</td><td>2017</td><td>Ethereum L2 scaling, enterprise adoption</td></tr>
+<tr><td style="font-weight:500;color:var(--text-accent)">Avalanche</td><td>Avalanche consensus</td><td>~4,500</td><td>2020</td><td>Subnet architecture, enterprise chains</td></tr>
+<tr><td style="font-weight:500;color:var(--text-accent)">Base</td><td>OP Stack (optimistic)</td><td>~2,000+</td><td>2023</td><td>Coinbase-backed Ethereum L2, consumer apps</td></tr>
+</tbody></table></div>
+<button onclick="sendPrompt('Explain Ethereum transaction finality, the mempool, and how MEV (maximal extractable value) works')" style="margin-top:1rem">How does the mempool and MEV work? ↗</button>
+</div>
+
+<!-- S3: SMART CONTRACTS -->
+<div class="gsec" id="s3" data-label="Smart Contracts">
+<p class="lbl">The logic layer</p>
+<h3 class="sec-t">Smart contracts</h3>
+<p class="sec-s">Programs deployed to a blockchain that execute automatically when predefined conditions are met — immutable once live, run identically by every node on the network with no intermediary.</p>
+<p class="lbl">Lifecycle</p>
+<div class="flow">
+  <div class="fs" style="background:var(--bg-accent);border-color:var(--border-accent)"><div class="fs-t" style="color:var(--text-accent)">1. Write</div><div class="fs-b">Code in Solidity (EVM) or Rust. Define state variables, functions, events.</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fs"><div class="fs-t">2. Compile</div><div class="fs-b">Source → EVM bytecode + ABI. The ABI tells clients how to call the contract.</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fs"><div class="fs-t">3. Deploy</div><div class="fs-b">Send a tx with no "to" address. Contract is permanently assigned an on-chain address.</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fs"><div class="fs-t">4. Call</div><div class="fs-b">Users send transactions to the contract. Every node runs the matching function identically.</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fs" style="background:var(--bg-success);border-color:var(--border-success)"><div class="fs-t" style="color:var(--text-success)">5. Execute</div><div class="fs-b">Conditions checked. State changes and transfers happen atomically. Recorded forever.</div></div>
+</div>
+<p class="lbl">A minimal token contract (Solidity)</p>
+<div class="code"><span style="color:var(--text-muted)">// SPDX-License-Identifier: MIT</span>
+<span style="color:var(--text-accent)">pragma solidity ^0.8.20;</span>
+
+<span style="color:var(--text-accent)">contract</span> MyToken {
+    string <span style="color:var(--text-accent)">public</span> name = <span style="color:var(--text-success)">"MyToken"</span>;
+    uint256 <span style="color:var(--text-accent)">public</span> totalSupply;
+    mapping(address => uint256) <span style="color:var(--text-accent)">public</span> balanceOf; <span style="color:var(--text-muted)">// on-chain storage</span>
+
+    <span style="color:var(--text-accent)">constructor</span>(uint256 supply) {
+        totalSupply = supply;
+        balanceOf[msg.sender] = supply; <span style="color:var(--text-muted)">// mint to deployer</span>
+    }
+
+    <span style="color:var(--text-accent)">function</span> transfer(address to, uint256 amount) <span style="color:var(--text-accent)">external</span> {
+        require(balanceOf[msg.sender] >= amount, <span style="color:var(--text-success)">"Insufficient balance"</span>);
+        balanceOf[msg.sender] -= amount;
+        balanceOf[to] += amount;
+        <span style="color:var(--text-accent)">emit</span> Transfer(msg.sender, to, amount);
+    }
+    <span style="color:var(--text-accent)">event</span> Transfer(address indexed from, address indexed to, uint256 value);
+}</div>
+<div class="div"></div>
+<p class="lbl">Gas — the cost of computation</p>
+<div class="g3">
+  <div class="card"><p class="ct">What is gas?</p><p class="cb">A unit measuring EVM computational work. Every opcode (store, add, call) costs a fixed amount of gas. Prevents infinite loops and spam attacks.</p></div>
+  <div class="card"><p class="ct">Gas price (gwei)</p><p class="cb">Since EIP-1559: base fee (burned permanently) + optional priority tip to validator. Higher tip = faster inclusion. Base fee adjusts per block automatically.</p></div>
+  <div class="card"><p class="ct">Gas limit</p><p class="cb">Max gas you authorize. If execution exceeds it, the tx reverts — but gas already consumed is not refunded. Set ~20% above the estimate.</p></div>
+</div>
+<div class="div"></div>
+<p class="lbl">Token standards (EVM)</p>
+<div class="g2">
+  <div class="card ac"><span class="badge ba" style="margin-bottom:8px">ERC-20</span><p class="ct">Fungible tokens</p><p class="cb">Standard for interchangeable tokens. 1 USDC always = 1 USDC. Powers currencies, governance tokens, and all DeFi assets.</p></div>
+  <div class="card pc"><span class="badge bp" style="margin-bottom:8px">ERC-721</span><p class="ct">Non-fungible tokens</p><p class="cb">Each token has a unique ID and is non-interchangeable. Standard for art, collectibles, game items, ENS names, real-world asset deeds.</p></div>
+  <div class="card sc2"><span class="badge bg-s" style="margin-bottom:8px">ERC-1155</span><p class="ct">Multi-token standard</p><p class="cb">Both fungible and non-fungible tokens in a single contract. Ideal for games (currency + unique items in one deploy). Batch transfer support.</p></div>
+  <div class="card wc"><span class="badge bw" style="margin-bottom:8px">ERC-4626</span><p class="ct">Tokenized vaults</p><p class="cb">Standard interface for yield-bearing vaults. Makes DeFi protocols composable — deposit into any vault using the same interface. Used across lending protocols.</p></div>
+</div>
+<button onclick="sendPrompt('Explain the most critical smart contract vulnerabilities: reentrancy, integer overflow, price oracle manipulation, and front-running — with Solidity code examples of each')">Learn about smart contract security ↗</button>
+</div>
+
+<!-- S4: DeFi -->
+<div class="gsec" id="s4" data-label="DeFi">
+<p class="lbl">Decentralized finance</p>
+<h3 class="sec-t">DeFi — banking without banks</h3>
+<p class="sec-s">Financial services (trading, lending, borrowing, earning yield) rebuilt as open-source smart contracts on public blockchains. No KYC, no opening hours, no permission required from anyone.</p>
+<div class="sg">
+  <div class="sc"><p class="sl">Peak TVL</p><p class="sv">$180B+</p></div>
+  <div class="sc"><p class="sl">Active protocols</p><p class="sv">1,000+</p></div>
+  <div class="sc"><p class="sl">Chains with DeFi</p><p class="sv">50+</p></div>
+  <div class="sc"><p class="sl">Daily DEX volume</p><p class="sv">$3–10B</p></div>
+</div>
+<p class="lbl">Core DeFi primitives</p>
+<div class="g2">
+  <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div class="ico" style="background:var(--bg-accent)"><i class="ti ti-arrows-exchange" style="color:var(--text-accent);font-size:16px" aria-hidden="true"></i></div><p class="ct" style="margin:0">DEXs — decentralized exchanges</p></div><p class="cb">Trade tokens directly from your wallet. No sign-up, no custody. Powered by Automated Market Makers using liquidity pools instead of order books.</p><div style="margin-top:10px;background:var(--surface-0);border-radius:var(--radius);padding:8px 10px;font-family:var(--font-mono);font-size:11px;color:var(--text-secondary)">x · y = k &nbsp;(constant product AMM formula)<br>Price = reserve_X / reserve_Y</div><p style="font-size:11px;color:var(--text-muted);margin:8px 0 0">Uniswap · Curve · dYdX · Balancer · Orca</p></div>
+  <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div class="ico" style="background:var(--bg-success)"><i class="ti ti-building-bank" style="color:var(--text-success);font-size:16px" aria-hidden="true"></i></div><p class="ct" style="margin:0">Lending & borrowing</p></div><p class="cb">Deposit assets to earn interest. Borrow against collateral — all enforced by smart contracts with automatic liquidations when collateral ratio falls below threshold.</p><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span class="badge bg-s">Earn APY</span><span class="badge ba">Overcollateralized</span><span class="badge bw">Flash loans</span></div><p style="font-size:11px;color:var(--text-muted);margin:8px 0 0">Aave · Compound · MakerDAO · Morpho</p></div>
+  <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div class="ico" style="background:var(--bg-warning)"><i class="ti ti-coin" style="color:var(--text-warning);font-size:16px" aria-hidden="true"></i></div><p class="ct" style="margin:0">Stablecoins</p></div><p class="cb">Tokens pegged to $1. Three models: fiat-backed (USDC, USDT), crypto-overcollateralized (DAI), and algorithmic — the last category carries high systemic risk (see UST collapse 2022).</p><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span class="badge ba">USDC — fiat backed</span><span class="badge bg-s">DAI — crypto backed</span></div></div>
+  <div class="card"><div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><div class="ico" style="background:var(--bg-pro)"><i class="ti ti-trending-up" style="color:var(--text-pro);font-size:16px" aria-hidden="true"></i></div><p class="ct" style="margin:0">Yield farming & liquidity provision</p></div><p class="cb">Provide token pairs to AMM pools and earn trading fees plus protocol token rewards. Key risk: impermanent loss occurs when deposited asset prices diverge from entry ratio.</p><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span class="badge bp">LP tokens</span><span class="badge bw">Impermanent loss</span></div></div>
+</div>
+<div class="div"></div>
+<p class="lbl">Key DeFi risks</p>
+<div class="g3">
+  <div class="card dc"><p class="ct" style="color:var(--text-danger)"><i class="ti ti-bug" aria-hidden="true" style="font-size:14px;margin-right:4px"></i>Smart contract exploits</p><p class="cb">Code bugs can drain entire protocols. Billions lost to reentrancy, logic errors, and access control flaws. Always check audit reports before depositing.</p></div>
+  <div class="card wc"><p class="ct" style="color:var(--text-warning)"><i class="ti ti-chart-candle" aria-hidden="true" style="font-size:14px;margin-right:4px"></i>Flash loan attacks</p><p class="cb">Borrow millions uncollateralized in one atomic transaction, manipulate an on-chain price oracle, exploit a protocol, repay — all in a single tx with no upfront capital.</p></div>
+  <div class="card"><p class="ct"><i class="ti ti-gavel" aria-hidden="true" style="font-size:14px;margin-right:4px"></i>Regulatory risk</p><p class="cb">Regulators may classify DeFi protocols as unregistered securities exchanges, creating significant legal uncertainty for users and developers globally.</p></div>
+</div>
+<button onclick="sendPrompt('Explain how Uniswap v3 concentrated liquidity works, the math behind impermanent loss, and how flash loans are technically possible without collateral')">Deep dive: AMMs, impermanent loss, flash loans ↗</button>
+</div>
+
+<!-- S5: NFTs -->
+<div class="gsec" id="s5" data-label="NFTs">
+<p class="lbl">Non-fungible tokens</p>
+<h3 class="sec-t">NFTs — provable digital ownership</h3>
+<p class="sec-s">A cryptographic certificate of authenticity and ownership for a unique asset — recorded on-chain, globally transferable without any intermediary, and verifiable by anyone.</p>
+<p class="lbl">Fungible vs non-fungible</p>
+<div class="g2">
+  <div class="card ac"><span class="badge ba" style="margin-bottom:8px">Fungible — ERC-20</span><p class="ct">Interchangeable units</p><p class="cb">Every unit is identical. 1 ETH = 1 ETH. Like dollar bills — it doesn't matter which specific unit you hold, only how many.</p><div style="display:flex;gap:6px;margin-top:10px;align-items:center;font-family:var(--font-mono);font-size:12px"><span style="background:var(--bg-accent);color:var(--text-accent);padding:4px 8px;border-radius:4px">Token A</span><span style="color:var(--text-success);font-size:16px;margin:0 4px">=</span><span style="background:var(--bg-accent);color:var(--text-accent);padding:4px 8px;border-radius:4px">Token B</span></div></div>
+  <div class="card pc"><span class="badge bp" style="margin-bottom:8px">Non-fungible — ERC-721</span><p class="ct">Unique identifiers</p><p class="cb">Each token has a unique ID. Like a deed to a specific house — #001 is definitively not #002, even on the same contract.</p><div style="display:flex;gap:6px;margin-top:10px;align-items:center;font-family:var(--font-mono);font-size:12px"><span style="background:var(--bg-pro);color:var(--text-pro);padding:4px 8px;border-radius:4px">#001</span><span style="color:var(--text-danger);font-size:16px;margin:0 4px">≠</span><span style="background:var(--bg-pro);color:var(--text-pro);padding:4px 8px;border-radius:4px">#002</span></div></div>
+</div>
+<p class="lbl">What's actually stored in an NFT?</p>
+<div class="card" style="margin-bottom:1.5rem"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:16px">
+  <div><p style="font-size:11px;color:var(--text-muted);margin:0 0 5px">On-chain (permanent)</p><p style="font-size:13px;color:var(--text-primary);margin:0;line-height:1.6">Token ID · Owner address · Contract address · Full transfer history · Royalty basis points</p></div>
+  <div><p style="font-size:11px;color:var(--text-muted);margin:0 0 5px">Metadata URI (often off-chain)</p><p style="font-size:13px;color:var(--text-primary);margin:0;line-height:1.6">Name · Description · Trait attributes · Image URL pointing to IPFS or a centralized server</p></div>
+  <div><p style="font-size:11px;color:var(--text-muted);margin:0 0 5px">Risk</p><p style="font-size:13px;color:var(--text-danger);margin:0;line-height:1.6">If the image lives on a centralized server, it can disappear. IPFS-pinned or fully on-chain SVG NFTs are far more durable.</p></div>
+</div></div>
+<p class="lbl">Use cases beyond digital art</p>
+<div class="g3">
+  <div class="card"><i class="ti ti-certificate" aria-hidden="true" style="font-size:20px;color:var(--text-accent);margin-bottom:8px"></i><p class="ct">Identity & credentials</p><p class="cb">Soulbound tokens (non-transferable) for diplomas, licenses, reputation scores, and on-chain attestations.</p></div>
+  <div class="card"><i class="ti ti-device-gamepad-2" aria-hidden="true" style="font-size:20px;color:var(--text-success);margin-bottom:8px"></i><p class="ct">Gaming assets</p><p class="cb">Truly own in-game items — trade, sell, or use across games. Real economic value that persists beyond a single title's servers.</p></div>
+  <div class="card"><i class="ti ti-ticket" aria-hidden="true" style="font-size:20px;color:var(--text-warning);margin-bottom:8px"></i><p class="ct">Tickets & memberships</p><p class="cb">Unforgeable event tickets. Membership passes with on-chain access gates and built-in royalties on every resale.</p></div>
+  <div class="card"><i class="ti ti-home-2" aria-hidden="true" style="font-size:20px;color:var(--text-pro);margin-bottom:8px"></i><p class="ct">Real-world assets (RWA)</p><p class="cb">Tokenize real estate, fine art, commodities. Enables fractional ownership of expensive assets on-chain via ERC-20 splits of ERC-721 deeds.</p></div>
+  <div class="card"><i class="ti ti-music" aria-hidden="true" style="font-size:20px;color:var(--text-danger);margin-bottom:8px"></i><p class="ct">Music & royalties</p><p class="cb">Artists sell royalty rights directly to fans. Smart contracts auto-distribute revenue to multiple rights-holders on every stream or sale.</p></div>
+  <div class="card"><i class="ti ti-world-www" aria-hidden="true" style="font-size:20px;color:var(--text-accent);margin-bottom:8px"></i><p class="ct">ENS domains</p><p class="cb">Turn 0x742d…f44e into alice.eth. Human-readable addresses, decentralized website hosting, and universal Web3 username.</p></div>
+</div>
+<button onclick="sendPrompt('What are soulbound tokens (SBTs), how do they work technically, and how could they reshape digital identity, reputation, and credentials on-chain?')">Explore soulbound tokens and digital identity ↗</button>
+</div>
+
+<!-- S6: DAOs -->
+<div class="gsec" id="s6" data-label="DAOs">
+<p class="lbl">Decentralized autonomous organizations</p>
+<h3 class="sec-t">DAOs — internet-native organizations</h3>
+<p class="sec-s">Organizations governed by token-holder votes and smart contracts. Rules are encoded on-chain, treasuries live in multi-sig contracts, and anyone with tokens can participate from anywhere.</p>
+<p class="lbl">DAO vs traditional company</p>
+<div class="cmp" style="grid-template-columns:1.3fr 1fr 1fr">
+  <div class="cc0"><div class="ch">Dimension</div><div class="cr">Decisions</div><div class="cr">Ownership</div><div class="cr">Treasury</div><div class="cr">Rulebook</div><div class="cr">Transparency</div><div class="cr">Membership</div></div>
+  <div class="cc"><div class="ch">Traditional company</div><div class="cr">Board + executives</div><div class="cr">Shareholders (equity)</div><div class="cr">Bank accounts</div><div class="cr">Legal contracts</div><div class="cr">Quarterly reports</div><div class="cr">Employment / investment</div></div>
+  <div class="cc" style="border-left:2px solid var(--border-accent)"><div class="ch" style="color:var(--text-accent)">DAO</div><div class="cr">Token-holder votes</div><div class="cr">Token holders</div><div class="cr">On-chain multi-sig</div><div class="cr">Smart contracts</div><div class="cr">Fully public on-chain</div><div class="cr">Token purchase</div></div>
+</div>
+<p class="lbl">Governance flow</p>
+<div class="tl">
+  <div class="tl-i"><div class="tl-d" style="background:var(--bg-accent);border:2px solid var(--border-accent);color:var(--text-accent)">1</div><p class="tl-t">Proposal submitted</p><p class="tl-b">Any token holder above a threshold (e.g. 1% of supply) submits a governance proposal on-chain or via Snapshot.</p></div>
+  <div class="tl-i"><div class="tl-d" style="background:var(--bg-success);border:2px solid var(--border-success);color:var(--text-success)">2</div><p class="tl-t">Discussion period</p><p class="tl-b">Community debates in forums (Discourse), Discord, and governance platforms like Tally or Commonwealth. Typically 3–7 days.</p></div>
+  <div class="tl-i"><div class="tl-d" style="background:var(--bg-warning);border:2px solid var(--border-warning);color:var(--text-warning)">3</div><p class="tl-t">Voting window</p><p class="tl-b">Token holders cast votes. Weight proportional to tokens held (or quadratic voting to limit whale dominance). Common window: 3–7 days. Quorum required.</p></div>
+  <div class="tl-i"><div class="tl-d" style="background:var(--bg-pro);border:2px solid var(--border-pro);color:var(--text-pro)">4</div><p class="tl-t">Timelock (safety delay)</p><p class="tl-b">Passed proposals enter a timelock (e.g. 48h) allowing users to exit before contentious changes take effect.</p></div>
+  <div class="tl-i" style="margin-bottom:0"><div class="tl-d" style="background:var(--bg-accent);border:2px solid var(--border-accent);color:var(--text-accent)">5</div><p class="tl-t">On-chain execution</p><p class="tl-b">Smart contract executes automatically — treasury transfers, parameter changes, protocol upgrades. No human signature required.</p></div>
+</div>
+<p class="lbl" style="margin-top:.5rem">Notable DAOs</p>
+<div class="g3">
+  <div class="card"><p class="ct">MakerDAO</p><p class="cb">Governs the DAI stablecoin. MKR holders vote on collateral types, stability fees, and risk parameters. One of the oldest and largest DAOs.</p></div>
+  <div class="card"><p class="ct">Uniswap DAO</p><p class="cb">Controls the Uniswap protocol treasury (over $1B). UNI holders vote on fee switches, grants, and cross-chain deployments.</p></div>
+  <div class="card"><p class="ct">Nouns DAO</p><p class="cb">One Noun NFT auctioned daily, forever. Every Noun = one vote on the treasury. A fully on-chain governance experiment with no roadmap.</p></div>
+</div>
+<button onclick="sendPrompt('What are the biggest failure modes of DAOs — voter apathy, plutocracy, Sybil attacks, legal status — and how does quadratic voting differ from token-weighted voting?')">Explore DAO governance challenges ↗</button>
+</div>
+
+<!-- S7: WALLETS -->
+<div class="gsec" id="s7" data-label="Keys & Wallets">
+<p class="lbl">Cryptography & custody</p>
+<h3 class="sec-t">Wallets, keys & L2 scaling</h3>
+<p class="sec-s">A wallet doesn't "store" crypto — it stores private keys that prove ownership. Assets live on-chain; your keys are the unforgeable signature. Lose them, lose everything, permanently.</p>
+<p class="lbl">Public-key cryptography</p>
+<div class="g3">
+  <div class="card dc"><i class="ti ti-key" aria-hidden="true" style="font-size:20px;color:var(--text-danger);margin-bottom:8px"></i><p class="ct">Private key</p><p class="cb">A 256-bit secret. Signs transactions to prove authorization. Never share with anyone. If lost or stolen, all funds are gone — no recovery exists.</p><div style="margin-top:8px;font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted);background:var(--surface-0);padding:6px;border-radius:4px;word-break:break-all">4c0883a69102937d6231471b5dba2b…</div></div>
+  <div class="card ac"><i class="ti ti-lock-open" aria-hidden="true" style="font-size:20px;color:var(--text-accent);margin-bottom:8px"></i><p class="ct">Public key</p><p class="cb">Derived from private key via elliptic curve math (secp256k1). Mathematically irreversible. Hashed to produce your wallet address. Safe to share.</p><div style="margin-top:8px;font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted);background:var(--surface-0);padding:6px;border-radius:4px;word-break:break-all">04 a1b2c3d4e5f6… (65 bytes uncompressed)</div></div>
+  <div class="card sc2"><i class="ti ti-at" aria-hidden="true" style="font-size:20px;color:var(--text-success);margin-bottom:8px"></i><p class="ct">Wallet address</p><p class="cb">Keccak-256 hash of public key, last 20 bytes. Your on-chain account number. Share publicly — anyone can send funds to it.</p><div style="margin-top:8px;font-family:var(--font-mono);font-size:10.5px;color:var(--text-muted);background:var(--surface-0);padding:6px;border-radius:4px;word-break:break-all">0x742d35Cc6634C0532925a3b844Bc454e…</div></div>
+</div>
+<div class="card wc" style="margin-bottom:1.5rem"><div style="display:flex;gap:12px;align-items:flex-start"><i class="ti ti-list-numbers" aria-hidden="true" style="font-size:24px;color:var(--text-warning);flex-shrink:0;margin-top:2px"></i><div><p class="ct" style="margin-bottom:6px">Seed phrase (BIP-39 mnemonic)</p><p class="cb">A human-readable backup of your private key — 12 or 24 words from the BIP-39 wordlist (2048 words). Deterministically regenerates all your keys across all compatible wallets. Whoever has these words controls all your funds across every chain. Write it on paper, store offline, never photograph it, never type it on any website.</p><div style="margin-top:10px;font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);background:var(--surface-0);padding:8px 12px;border-radius:var(--radius);letter-spacing:.02em">grocery · window · planet · ocean · tiger · solar · dream · vault · crystal · bridge · ember · moon</div></div></div></div>
+<p class="lbl">Wallet types</p>
+<div class="g2" style="margin-bottom:1.5rem">
+  <div class="card wc"><span class="badge bw" style="margin-bottom:8px">Hot wallet</span><p class="ct">Software wallets</p><p class="cb">Connected to the internet. Convenient for daily use and dApp interactions. Higher attack surface — malicious sites can attempt to steal keys via browser extensions.</p><p style="font-size:11px;color:var(--text-muted);margin:8px 0 0">MetaMask · Phantom · Rabby · Coinbase Wallet · Trust Wallet</p></div>
+  <div class="card sc2"><span class="badge bg-s" style="margin-bottom:8px">Cold wallet</span><p class="ct">Hardware wallets</p><p class="cb">Private key lives on an isolated security chip, never exposed to the internet. All transaction signing happens on-device. Best security for significant holdings.</p><p style="font-size:11px;color:var(--text-muted);margin:8px 0 0">Ledger · Trezor · Coldcard · Keystone</p></div>
+</div>
+<div class="div"></div>
+<p class="lbl">Layer 1 vs Layer 2 scaling</p>
+<div class="g2">
+  <div class="card ac"><span class="badge ba" style="margin-bottom:8px">L1 — base layer</span><p class="ct">Settlement & security</p><p class="cb">The main chain (Ethereum, Bitcoin). Maximally decentralized and secure. Limited throughput causes high fees during peak demand. The ultimate source of truth.</p></div>
+  <div class="card pc"><span class="badge bp" style="margin-bottom:8px">L2 — scaling layer</span><p class="ct">Rollups execute off-chain</p><p class="cb">Execute thousands of transactions off-chain, post compressed proofs to L1 for security. 10–100× cheaper and faster. Two dominant types:</p><div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap"><span class="badge ba">Optimistic rollups</span><span class="badge bp">ZK rollups</span></div><p style="font-size:11px;color:var(--text-muted);margin:8px 0 0">Optimistic: Arbitrum, Optimism, Base · ZK: zkSync, StarkNet, Polygon zkEVM</p></div>
+</div>
+<button onclick="sendPrompt('Explain zero-knowledge proofs and ZK rollups in depth — how does a validity proof let Ethereum verify Layer 2 transactions without re-executing every single one?')">Deep dive: ZK proofs and rollup architecture ↗</button>
+</div>
+
+</div>
+<script>
+(function(){
+  var nav=document.getElementById('gnav');
+  var secs=document.querySelectorAll('.gsec');
+  function show(id){
+    secs.forEach(function(s){s.style.display='none';});
+    document.getElementById(id).style.display='block';
+    nav.querySelectorAll('.gtab').forEach(function(b){b.classList.remove('active');});
+    nav.querySelector('[data-t="'+id+'"]').classList.add('active');
+  }
+  secs.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.className='gtab'+(i===0?' active':'');
+    b.dataset.t=s.id;
+    b.textContent=s.dataset.label;
+    b.onclick=function(){show(s.id);};
+    nav.appendChild(b);
+    if(i>0)s.style.display='none';
+  });
+  nav.style.display='flex';
+})();
+</script>

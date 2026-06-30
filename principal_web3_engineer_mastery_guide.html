@@ -1,0 +1,408 @@
+
+<h2 class="sr-only">Comprehensive guide for Principal Blockchain and Web3 engineers — cryptographic foundations, consensus algorithms, smart contract engineering, security auditing, architecture trade-offs, enterprise deployment, tokenomics, and freelance career strategy.</h2>
+<style>
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+.gw{padding:.5rem 0 2rem}
+#gnav{display:none;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:.5px solid var(--border)}
+.gtab{padding:5px 13px;border-radius:var(--radius);border:.5px solid var(--border);background:transparent;color:var(--text-secondary);font-size:13px;cursor:pointer}
+.gtab:hover,.gtab.active{background:var(--surface-1);color:var(--text-primary);border-color:var(--border-strong)}
+.gtab.active{font-weight:500}
+.lbl{font-size:11px;color:var(--text-muted);font-weight:500;letter-spacing:.06em;text-transform:uppercase;margin:1.2rem 0 10px}
+.lbl:first-of-type{margin-top:0}
+.sec-t{font-size:20px;font-weight:500;color:var(--text-primary);margin:4px 0 5px}
+.sec-s{font-size:13px;color:var(--text-secondary);margin:0 0 1.5rem;line-height:1.65}
+.col2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-bottom:1rem}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:12px;margin-bottom:1rem}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:12px;margin-bottom:1rem}
+.card{background:var(--surface-1);border:.5px solid var(--border);border-radius:12px;padding:.9rem 1.1rem}
+.ct{font-size:13px;font-weight:500;color:var(--text-primary);margin:0 0 5px}
+.cb{font-size:12.5px;color:var(--text-secondary);margin:0;line-height:1.55}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:500;margin-right:4px;margin-bottom:6px}
+.ba{background:var(--bg-accent);color:var(--text-accent)}
+.bg{background:var(--bg-success);color:var(--text-success)}
+.bw{background:var(--bg-warning);color:var(--text-warning)}
+.bd{background:var(--bg-danger);color:var(--text-danger)}
+.bp{background:var(--bg-pro);color:var(--text-pro)}
+.div{border:none;border-top:.5px solid var(--border);margin:1.5rem 0}
+.cmp{display:grid;gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.cc{background:var(--surface-1);padding:.65rem .9rem}
+.cc0{background:var(--surface-0);padding:.65rem .9rem}
+.ch{font-size:11.5px;font-weight:500;color:var(--text-primary);margin-bottom:.4rem}
+.cr{font-size:11.5px;color:var(--text-secondary);padding:3px 0;border-top:.5px solid var(--border);line-height:1.4}
+table.t{width:100%;font-size:12px;border-collapse:collapse;margin-bottom:1rem}
+table.t th{text-align:left;padding:6px 9px;font-weight:500;border-bottom:.5px solid var(--border);background:var(--surface-0);color:var(--text-secondary)}
+table.t td{padding:6px 9px;color:var(--text-secondary);border-bottom:.5px solid var(--border);font-size:11.5px}
+table.t td.lc{font-weight:500;color:var(--text-primary)}
+table.t tr:last-child td{border-bottom:none}
+.note{background:var(--bg-warning);border:.5px solid var(--border-warning);border-radius:var(--radius);padding:9px 12px;font-size:12px;color:var(--text-warning);margin-bottom:1rem;line-height:1.5}
+.good{background:var(--bg-success);border:.5px solid var(--border-success);border-radius:var(--radius);padding:9px 12px;font-size:12px;color:var(--text-success);margin-bottom:1rem;line-height:1.5}
+.info{background:var(--bg-accent);border:.5px solid var(--border-accent);border-radius:var(--radius);padding:9px 12px;font-size:12px;color:var(--text-accent);margin-bottom:1rem;line-height:1.5}
+.ac{border-color:var(--border-accent)!important}
+.pc{border-color:var(--border-pro)!important}
+.sc{border-color:var(--border-success)!important}
+.wc{border-color:var(--border-warning)!important}
+.dc{border-color:var(--border-danger)!important}
+.mono{font-family:var(--font-mono);font-size:11px;background:var(--surface-0);border:.5px solid var(--border);border-radius:4px;padding:1px 5px;color:var(--text-primary)}
+.flow{display:flex;align-items:stretch;gap:0;margin-bottom:1rem;overflow-x:auto;padding-bottom:4px}
+.fb{background:var(--surface-2);border:.5px solid var(--border);border-radius:var(--radius);padding:9px 11px;min-width:110px;flex:1;flex-shrink:0}
+.fb-t{font-size:11px;font-weight:500;color:var(--text-primary);margin-bottom:3px}
+.fb-s{font-size:10.5px;color:var(--text-secondary);line-height:1.4}
+.fa{color:var(--text-muted);font-size:16px;display:flex;align-items:center;padding:0 3px;flex-shrink:0}
+.math{background:var(--surface-0);border:.5px solid var(--border);border-radius:var(--radius);padding:.8rem .9rem;font-family:var(--font-mono);font-size:11.5px;color:var(--text-primary);line-height:1.75;margin-bottom:1rem}
+.mc{color:var(--text-muted)}
+.checklist{display:flex;flex-direction:column;gap:5px;margin-bottom:1rem}
+.ci{display:flex;gap:7px;align-items:flex-start;font-size:12.5px;color:var(--text-secondary);line-height:1.5}
+.ico{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+</style>
+
+<div class="gw">
+<div id="gnav"></div>
+
+<!-- TAB 1: FOUNDATIONS & ALGORITHMS -->
+<div class="gsec" id="s1" data-label="Foundations & algorithms">
+<p class="lbl" style="margin-top:0">The non-negotiable base layer</p>
+<h3 class="sec-t">Cryptography, consensus & distributed systems theory</h3>
+<p class="sec-s">A principal engineer doesn't just call <span class="mono">sign()</span> — they know which signature scheme to recommend, why, and what it costs. This is the layer that everything else is built on.</p>
+
+<p class="lbl">Cryptographic primitives</p>
+<div class="g2">
+  <div class="card"><p class="ct"><i class="ti ti-hash" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>Hash functions</p><p class="cb">SHA-256 (Bitcoin) · Keccak-256 (Ethereum, distinct from standard SHA-3) · Blake2b/Blake3 (fast, used in newer chains) · Poseidon (ZK-circuit-friendly — minimizes constraint count in SNARKs).</p></div>
+  <div class="card"><p class="ct"><i class="ti ti-signature" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>Digital signatures</p><p class="cb">ECDSA/secp256k1 (Bitcoin, Ethereum) · EdDSA/Ed25519 (Solana — faster, deterministic nonces avoid the Sony PS3-style nonce-reuse bug) · BLS signatures (aggregatable — thousands of validator signatures compress into one).</p></div>
+  <div class="card"><p class="ct"><i class="ti ti-binary-tree" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>Merkle structures</p><p class="cb">Merkle trees (inclusion proofs) · Patricia Merkle Tries (Ethereum's state trie) · Merkle Mountain Ranges (append-only, used in bridges/L2s) · Verkle trees (Ethereum's upcoming upgrade — vector commitments shrink proof size).</p></div>
+  <div class="card"><p class="ct"><i class="ti ti-lock-square" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>Commitment schemes</p><p class="cb">Pedersen commitments (homomorphic — basis for Confidential Transactions, Bulletproofs) · KZG/polynomial commitments (constant-size proofs — powers EIP-4844 blobs and most modern SNARK systems).</p></div>
+</div>
+
+<p class="lbl">Consensus algorithm landscape</p>
+<div style="overflow-x:auto">
+<table class="t">
+  <thead><tr><th>Algorithm</th><th>Type</th><th>Finality</th><th>Fault tolerance</th><th>Used by</th></tr></thead>
+  <tbody>
+    <tr><td class="lc">Nakamoto PoW</td><td>Longest-chain</td><td>Probabilistic</td><td>51% honest hashpower</td><td>Bitcoin</td></tr>
+    <tr><td class="lc">Casper FFG + LMD-GHOST</td><td>Hybrid PoS</td><td>~12.8 min (2 epochs)</td><td>1/3 Byzantine</td><td>Ethereum</td></tr>
+    <tr><td class="lc">Tendermint BFT</td><td>Classical BFT</td><td>Instant / single block</td><td>1/3 Byzantine</td><td>Cosmos chains</td></tr>
+    <tr><td class="lc">Avalanche consensus</td><td>Metastable / probabilistic</td><td>Sub-second</td><td>Configurable (~80% honest)</td><td>Avalanche</td></tr>
+    <tr><td class="lc">HotStuff</td><td>Linear BFT</td><td>Single round-trip</td><td>1/3 Byzantine</td><td>Aptos, Sui (derivatives)</td></tr>
+    <tr><td class="lc">PoH + Tower BFT</td><td>PoS + verifiable delay</td><td>~13s economic finality</td><td>1/3 Byzantine</td><td>Solana</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="lbl">Distributed systems theory you must internalize</p>
+<div class="g2">
+  <div class="info"><i class="ti ti-info-circle" aria-hidden="true" style="font-size:14px;margin-right:5px"></i><strong style="font-weight:500">CAP theorem applied to blockchain:</strong> public chains choose consistency + partition tolerance over availability during network splits — this is why finality, not instant confirmation, is the real safety guarantee.</div>
+  <div class="info"><i class="ti ti-info-circle" aria-hidden="true" style="font-size:14px;margin-right:5px"></i><strong style="font-weight:500">FLP impossibility:</strong> no deterministic consensus protocol can guarantee both safety and liveness in a fully asynchronous network with even one faulty node — every real protocol makes a synchrony assumption to work around this.</div>
+  <div class="info"><i class="ti ti-info-circle" aria-hidden="true" style="font-size:14px;margin-right:5px"></i><strong style="font-weight:500">BFT threshold:</strong> classical BFT tolerates up to 1/3 malicious nodes (needs 2/3+1 for safety); this 1/3 boundary is mathematically provable, not a design choice — it shows up everywhere from Tendermint to Ethereum slashing.</div>
+  <div class="info"><i class="ti ti-info-circle" aria-hidden="true" style="font-size:14px;margin-right:5px"></i><strong style="font-weight:500">The blockchain trilemma:</strong> decentralization, security, and scalability — optimizing two typically degrades the third. Every L1/L2 design decision is a trilemma trade-off in disguise.</div>
+</div>
+
+<p class="lbl">Cryptoeconomic security primitives</p>
+<div class="g4">
+  <div class="card"><p class="ct">Sybil resistance</p><p class="cb">PoW (cost via hashpower) vs PoS (cost via stake) vs PoA (cost via reputation/identity).</p></div>
+  <div class="card"><p class="ct">Nothing-at-stake</p><p class="cb">PoS-specific problem — validators can cheaply vote on multiple chain histories. Solved via slashing.</p></div>
+  <div class="card"><p class="ct">Slashing design</p><p class="cb">Penalties for equivocation/downtime must exceed the expected gain from misbehaving — exact ratios are a security parameter.</p></div>
+  <div class="card"><p class="ct">Honest majority</p><p class="cb">Every protocol's security proof rests on an assumption (51%, 67%, etc.) — know which one and what breaks it.</p></div>
+</div>
+<button onclick="sendPrompt('Explain zk-SNARKs vs zk-STARKs in depth from a principal engineer perspective — trusted setup requirements, proof size, verification cost, and post-quantum security trade-offs')">SNARKs vs STARKs: the proof system trade-off ↗</button>
+</div>
+
+<!-- TAB 2: SMART CONTRACT ENGINEERING -->
+<div class="gsec" id="s2" data-label="Contract engineering">
+<p class="lbl" style="margin-top:0">Beyond "it compiles"</p>
+<h3 class="sec-t">Advanced patterns, gas algorithms & verification</h3>
+<p class="sec-s">Principal-level contract engineering means choosing the right upgrade pattern for the risk profile, optimizing gas at the assembly level when it matters, and proving correctness — not just testing for it.</p>
+
+<p class="lbl">Upgradeable & modular design patterns</p>
+<div class="g3">
+  <div class="card ac"><span class="badge ba" style="margin-bottom:6px">EIP-2535</span><p class="ct">Diamond pattern</p><p class="cb">Single proxy routes to multiple "facet" contracts by function selector. Solves the 24KB contract size limit and enables granular, audit-scoped upgrades.</p></div>
+  <div class="card"><p class="ct">Transparent proxy</p><p class="cb">Admin and user calls routed differently to avoid selector clashes. Higher gas overhead per call than UUPS, but simpler to reason about.</p></div>
+  <div class="card"><p class="ct">UUPS proxy</p><p class="cb">Upgrade logic lives in the implementation, not the proxy. Cheaper calls, but a bad implementation can permanently brick upgradeability.</p></div>
+  <div class="card"><p class="ct">Beacon proxy</p><p class="cb">Many proxies point to one beacon holding the implementation address — one transaction upgrades thousands of clone contracts simultaneously.</p></div>
+  <div class="card"><p class="ct">Factory pattern</p><p class="cb">Deploy minimal proxy clones (EIP-1167) for cheap, repeatable contract instantiation — common in vault and NFT collection deployments.</p></div>
+  <div class="card"><p class="ct">Circuit breaker</p><p class="cb">Pausable modifier + guardian role lets you halt a contract under attack without a full timelock-gated upgrade — the first line of incident response.</p></div>
+</div>
+
+<p class="lbl">Gas optimization algorithmic toolkit</p>
+<div class="checklist">
+  <div class="ci"><i class="ti ti-circle-check" aria-hidden="true" style="font-size:14px;color:var(--text-success);flex-shrink:0;margin-top:2px"></i><span><strong style="font-weight:500;color:var(--text-primary)">Storage slot packing</strong> — order struct fields smallest-to-largest to share 32-byte slots; can cut SSTORE costs 2-3x.</span></div>
+  <div class="ci"><i class="ti ti-circle-check" aria-hidden="true" style="font-size:14px;color:var(--text-success);flex-shrink:0;margin-top:2px"></i><span><strong style="font-weight:500;color:var(--text-primary)">Custom errors over require strings</strong> — ~4x cheaper, since string data isn't stored in bytecode.</span></div>
+  <div class="ci"><i class="ti ti-circle-check" aria-hidden="true" style="font-size:14px;color:var(--text-success);flex-shrink:0;margin-top:2px"></i><span><strong style="font-weight:500;color:var(--text-primary)">Yul/assembly for hot paths</strong> — bypass Solidity's safety checks deliberately, only after the surrounding logic is proven safe.</span></div>
+  <div class="ci"><i class="ti ti-circle-check" aria-hidden="true" style="font-size:14px;color:var(--text-success);flex-shrink:0;margin-top:2px"></i><span><strong style="font-weight:500;color:var(--text-primary)">Multicall batching</strong> — amortize the 21,000 gas base transaction cost across many operations in one call.</span></div>
+  <div class="ci"><i class="ti ti-circle-check" aria-hidden="true" style="font-size:14px;color:var(--text-success);flex-shrink:0;margin-top:2px"></i><span><strong style="font-weight:500;color:var(--text-primary)">Calldata over memory</strong> for external function array/string params — calldata is never copied, memory is.</span></div>
+</div>
+
+<p class="lbl">Verification maturity model</p>
+<div class="flow">
+  <div class="fb"><div class="fb-t">Unit tests</div><div class="fb-s">Hardhat / Foundry forge test — known inputs, known outputs</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fb"><div class="fb-t">Fuzz testing</div><div class="fb-s">Foundry / Echidna — random inputs hunt for reverts and edge cases</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fb" style="background:var(--bg-accent);border-color:var(--border-accent)"><div class="fb-t" style="color:var(--text-accent)">Invariant testing</div><div class="fb-s">Property-based: "total supply never decreases" holds across random call sequences</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fb" style="background:var(--bg-pro);border-color:var(--border-pro)"><div class="fb-t" style="color:var(--text-pro)">Formal verification</div><div class="fb-s">Certora Prover / Halmos / K framework — mathematically proves properties hold for ALL inputs</div></div>
+</div>
+
+<p class="lbl">Cross-VM architecture awareness</p>
+<div class="cmp" style="grid-template-columns:1fr 1fr 1fr 1fr">
+  <div class="cc0"><div class="ch">Property</div><div class="cr">Account model</div><div class="cr">Parallelism</div><div class="cr">Safety guarantee</div></div>
+  <div class="cc"><div class="ch">EVM</div><div class="cr">Contract-owned storage</div><div class="cr">Sequential</div><div class="cr">None innate — relies on dev discipline</div></div>
+  <div class="cc"><div class="ch">SVM (Solana)</div><div class="cr">External accounts, stateless programs</div><div class="cr">Parallel (non-overlapping writes)</div><div class="cr">Rust ownership at compile time</div></div>
+  <div class="cc"><div class="ch">MoveVM (Aptos/Sui)</div><div class="cr">Resource-typed objects</div><div class="cr">Parallel (object-level)</div><div class="cr">Linear types — assets can't be copied/dropped accidentally</div></div>
+</div>
+<button onclick="sendPrompt('Walk me through how Certora Prover formal verification actually works for a Solidity contract — what does a specification (CVL) look like and what kinds of bugs can it catch that fuzzing cannot?')">How formal verification actually works ↗</button>
+</div>
+
+<!-- TAB 3: SECURITY & AUDITING -->
+<div class="gsec" id="s3" data-label="Security & auditing">
+<p class="lbl" style="margin-top:0">The skill that defines the role</p>
+<h3 class="sec-t">Audit methodology & incident response</h3>
+<p class="sec-s">At principal level, security isn't a checklist you run once — it's a lifecycle discipline spanning threat modeling before code is written through post-mortem after an incident is resolved.</p>
+
+<p class="lbl">The audit lifecycle</p>
+<div class="flow">
+  <div class="fb"><div class="fb-t">1. Scoping</div><div class="fb-s">Define attack surface, LOC, prior audits, deployment chain(s)</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fb"><div class="fb-t">2. Threat modeling</div><div class="fb-s">Enumerate actors, trust assumptions, value at risk</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fb"><div class="fb-t">3. Automated scan</div><div class="fb-s">Slither, Mythril — catches known patterns fast</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fb" style="background:var(--bg-accent);border-color:var(--border-accent)"><div class="fb-t" style="color:var(--text-accent)">4. Manual review</div><div class="fb-s">Line-by-line, business-logic and economic reasoning</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fb"><div class="fb-t">5. PoC exploits</div><div class="fb-s">Prove findings are real, not theoretical</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fb" style="background:var(--bg-success);border-color:var(--border-success)"><div class="fb-t" style="color:var(--text-success)">6. Fix verification</div><div class="fb-s">Re-audit patches before mainnet sign-off</div></div>
+</div>
+
+<p class="lbl">Vulnerability taxonomy — principal-level additions</p>
+<div class="g3">
+  <div class="card dc"><p class="ct">Governance attacks</p><p class="cb">Flash-loan a governance token, vote through a malicious proposal, repay loan in the same transaction — defended by vote-snapshotting and timelocks.</p></div>
+  <div class="card dc"><p class="ct">Signature replay / malleability</p><p class="cb">Reusing a valid signature across chains or contexts. Mitigate with EIP-712 domain separators and nonce tracking.</p></div>
+  <div class="card wc"><p class="ct">Gas griefing / DoS</p><p class="cb">Forcing a contract into an unbounded loop or out-of-gas revert — common in unbounded array iteration or unchecked external call gas forwarding.</p></div>
+  <div class="card wc"><p class="ct">Generalized frontrunning</p><p class="cb">Bots that detect ANY profitable transaction pattern (not just known exploits) and replay it with higher gas — defend with commit-reveal.</p></div>
+  <div class="card dc"><p class="ct">Cross-chain message replay</p><p class="cb">A valid bridge message replayed on a different chain or executed twice — requires chain ID + nonce in every cross-chain payload.</p></div>
+  <div class="card wc"><p class="ct">Economic exploits</p><p class="cb">Interest rate manipulation, reward calculation rounding errors, donation attacks on share-based vaults (ERC-4626 inflation attack).</p></div>
+</div>
+
+<p class="lbl">Audit tooling stack by category</p>
+<div class="cmp" style="grid-template-columns:1fr 2fr">
+  <div class="cc0"><div class="ch">Category</div><div class="cr">Static analysis</div><div class="cr">Symbolic execution</div><div class="cr">Fuzzing</div><div class="cr">Formal verification</div><div class="cr">Solana-specific</div></div>
+  <div class="cc"><div class="ch">Tools</div><div class="cr">Slither, Semgrep — pattern matching against known bug classes</div><div class="cr">Mythril, Manticore — explores all execution paths symbolically</div><div class="cr">Echidna, Foundry — random + guided input generation</div><div class="cr">Certora Prover, Halmos, K framework — mathematical proofs</div><div class="cr">Soteria, Sec3 X-ray — account validation and signer checks</div></div>
+</div>
+
+<p class="lbl">Incident response framework</p>
+<div class="g4">
+  <div class="card"><p class="ct">Circuit breakers</p><p class="cb">Pause functionality must be tested as rigorously as the happy path — it's your only lever during a live exploit.</p></div>
+  <div class="card"><p class="ct">Timelock as safety net</p><p class="cb">Even a compromised admin key can't execute instantly — gives the community a window to detect and react.</p></div>
+  <div class="card"><p class="ct">Whitehat rescue</p><p class="cb">Front-running your own exploit to move funds to safety before an attacker — requires pre-built tooling and fast decision authority.</p></div>
+  <div class="card"><p class="ct">Bug bounty tiers</p><p class="cb">Immunefi-standard severity classification (Critical/High/Medium/Low) ties payout to funds-at-risk, not just technical novelty.</p></div>
+</div>
+<button onclick="sendPrompt('Walk me through the ERC-4626 vault inflation attack in detail — how does a donation attack manipulate share price, and what specific mitigations (virtual shares, minimum deposits) prevent it?')">The ERC-4626 vault inflation attack explained ↗</button>
+</div>
+
+<!-- TAB 4: ARCHITECTURE & SCALABILITY -->
+<div class="gsec" id="s4" data-label="Architecture & scaling">
+<p class="lbl" style="margin-top:0">Decisions with multi-year consequences</p>
+<h3 class="sec-t">Trilemma trade-offs across L1, L2, and interop</h3>
+<p class="sec-s">Architecture decisions at this level aren't reversible without enormous cost. Every choice here is a trade-off you must be able to defend in front of a CTO or investment committee.</p>
+
+<p class="lbl">L1 vs L2 vs appchain vs sidechain</p>
+<div class="cmp" style="grid-template-columns:1fr 1fr 1fr 1fr">
+  <div class="cc0"><div class="ch">Option</div><div class="cr">Security source</div><div class="cr">Customizability</div><div class="cr">Time to launch</div><div class="cr">Best for</div></div>
+  <div class="cc"><div class="ch">L1 (new chain)</div><div class="cr">Own validator set</div><div class="cr">Total</div><div class="cr">Years</div><div class="cr">Fundamentally novel consensus needs</div></div>
+  <div class="cc"><div class="ch">L2 rollup</div><div class="cr">Inherited from L1</div><div class="cr">Moderate (sequencer config)</div><div class="cr">Weeks (OP Stack/CDK)</div><div class="cr">Most new protocols</div></div>
+  <div class="cc"><div class="ch">Appchain / subnet</div><div class="cr">Own or shared validator set</div><div class="cr">High</div><div class="cr">Days–weeks</div><div class="cr">High-throughput single-app needs</div></div>
+  <div class="cc"><div class="ch">Sidechain</div><div class="cr">Independent validator set</div><div class="cr">Total</div><div class="cr">Months</div><div class="cr">Legacy — mostly superseded by rollups</div></div>
+</div>
+
+<p class="lbl">Rollup trade-off: optimistic vs ZK</p>
+<div class="col2">
+  <div class="card wc">
+    <span class="badge bw" style="margin-bottom:6px">Optimistic rollups</span>
+    <p class="cb" style="margin-bottom:0;line-height:1.7">Fraud proofs — assume valid, allow challenge window<br>7-day withdrawal delay to L1<br>Full EVM equivalence, easiest to port existing contracts<br>Cheap to generate, expensive only if challenged<br><span class="mono">Arbitrum, Optimism, Base</span></p>
+  </div>
+  <div class="card pc">
+    <span class="badge bp" style="margin-bottom:6px">ZK rollups</span>
+    <p class="cb" style="margin-bottom:0;line-height:1.7">Validity proofs — cryptographically proven correct<br>Near-instant withdrawal (no challenge window)<br>EVM-equivalence spectrum: Type 1 (full) → Type 4 (compiled, fastest but least compatible)<br>Higher prover cost, more complex tooling<br><span class="mono">zkSync, Scroll, Polygon zkEVM, StarkNet</span></p>
+  </div>
+</div>
+<div class="note"><i class="ti ti-alert-triangle" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>SNARK vs STARK inside ZK rollups: SNARKs (Groth16/PLONK) need a trusted setup (except Halo2's universal setup) and produce smaller proofs; STARKs need no trusted setup, are post-quantum resistant, but produce larger proofs. StarkNet uses STARKs; most others use SNARK variants.</div>
+
+<p class="lbl">Cross-chain trust spectrum</p>
+<div class="g3">
+  <div class="card sc"><span class="badge bg" style="margin-bottom:6px">Natively verified</span><p class="cb">Light client verification — the destination chain actually verifies source chain consensus. Highest security, highest engineering cost. <span class="mono">IBC (Cosmos)</span></p></div>
+  <div class="card wc"><span class="badge bw" style="margin-bottom:6px">Externally verified</span><p class="cb">A separate validator/oracle set attests to source chain state. Faster to build, introduces a new trust assumption. <span class="mono">LayerZero, Wormhole, CCIP</span></p></div>
+  <div class="card"><span class="badge ba" style="margin-bottom:6px">Optimistically verified</span><p class="cb">Assume valid, allow a fraud-proof challenge window — trade speed for a withdrawal delay. <span class="mono">Across, Optimism native bridge</span></p></div>
+</div>
+
+<p class="lbl">Oracle & data availability trade-offs</p>
+<div class="col2">
+  <div class="card"><p class="ct">Push vs pull oracles</p><p class="cb">Push (Chainlink Data Feeds): updates on-chain continuously, costs gas constantly, always fresh. Pull (Pyth, Chainlink Data Streams): fetched on-demand, cheaper, requires the consumer to request freshness explicitly.</p></div>
+  <div class="card"><p class="ct">Data availability layers</p><p class="cb">On-chain DA (full L1 security, expensive) vs dedicated DA layers like Celestia/EigenDA (cheaper, separate trust assumption) vs validiums (off-chain DA + validity proofs — cheapest, weakest data guarantee).</p></div>
+</div>
+<button onclick="sendPrompt('Walk me through the EVM-equivalence spectrum for ZK rollups in detail — what specifically differs between Type 1, Type 2, Type 3, and Type 4 zkEVMs, and what are the engineering trade-offs at each tier?')">The zkEVM Type 1-4 spectrum explained ↗</button>
+</div>
+
+<!-- TAB 5: ENTERPRISE DEPLOYMENT -->
+<div class="gsec" id="s5" data-label="Enterprise deployment">
+<p class="lbl" style="margin-top:0">Where blockchain meets corporate reality</p>
+<h3 class="sec-t">Permissioning, compliance & operations at scale</h3>
+<p class="sec-s">Enterprise engagements bring constraints public-chain-only engineers rarely face: regulatory review, legacy system integration, internal audit committees, and key custody that must survive employee turnover.</p>
+
+<p class="lbl">Permissioned vs permissionless decision framework</p>
+<div class="cmp" style="grid-template-columns:1fr 1fr 1fr">
+  <div class="cc0"><div class="ch">Model</div><div class="cr">Examples</div><div class="cr">Governance</div><div class="cr">Best for</div></div>
+  <div class="cc"><div class="ch">Public permissionless</div><div class="cr">Ethereum, Solana mainnet</div><div class="cr">Token-holder / on-chain</div><div class="cr">Consumer-facing, censorship resistance matters</div></div>
+  <div class="cc"><div class="ch">Consortium / permissioned</div><div class="cr">Hyperledger Fabric, Besu, Corda</div><div class="cr">Known-member committee</div><div class="cr">Multi-org supply chain, interbank settlement</div></div>
+  <div class="cc"><div class="ch">App-specific subnet</div><div class="cr">Avalanche Subnet, Polygon CDK, OP Stack</div><div class="cr">Single org or small set</div><div class="cr">Internal tokenized asset systems, gaming</div></div>
+</div>
+
+<p class="lbl">Compliance & regulatory awareness</p>
+<div class="g3">
+  <div class="card"><p class="ct">KYC/AML integration</p><p class="cb">On-chain identity attestations (soulbound credentials) or off-chain gating at the application layer — never assume the chain handles this for you.</p></div>
+  <div class="card"><p class="ct">Securities considerations</p><p class="cb">Token design decisions (profit expectation, common enterprise, reliance on others' efforts) carry Howey-test-adjacent implications — flag for legal review, never self-certify.</p></div>
+  <div class="card"><p class="ct">Immutability vs GDPR</p><p class="cb">Right-to-erasure conflicts with on-chain permanence. Standard pattern: store only a hash on-chain, keep erasable PII off-chain.</p></div>
+</div>
+
+<p class="lbl">CI/CD pipeline for smart contracts</p>
+<div class="flow">
+  <div class="fb"><div class="fb-t">Local dev</div><div class="fb-s">Foundry/Hardhat, unit + fuzz tests on every commit</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fb"><div class="fb-t">Testnet deploy</div><div class="fb-s">Automated on PR merge, integration tests against live testnet</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fb" style="background:var(--bg-warning);border-color:var(--border-warning)"><div class="fb-t" style="color:var(--text-warning)">Audit gate</div><div class="fb-s">Manual hold — no mainnet path without sign-off</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fb" style="background:var(--bg-accent);border-color:var(--border-accent)"><div class="fb-t" style="color:var(--text-accent)">Multi-sig deploy</div><div class="fb-s">M-of-N signers required, never a single EOA</div></div>
+  <div class="fa"><i class="ti ti-arrow-right" aria-hidden="true"></i></div>
+  <div class="fb" style="background:var(--bg-success);border-color:var(--border-success)"><div class="fb-t" style="color:var(--text-success)">Verify & monitor</div><div class="fb-s">Etherscan source verification, alerting goes live immediately</div></div>
+</div>
+
+<p class="lbl">Monitoring, custody & upgrade governance</p>
+<div class="g3">
+  <div class="card"><p class="ct">Observability stack</p><p class="cb">Forta / OpenZeppelin Defender for anomaly detection, Tenderly for transaction simulation and alerting, custom indexers for protocol-specific metrics.</p></div>
+  <div class="card"><p class="ct">Key management</p><p class="cb">HSMs for institutional custody, MPC wallets (Fireblocks-style) eliminate single-key risk, Safe multi-sig for treasury and admin operations — never a hot EOA holding admin rights.</p></div>
+  <div class="card"><p class="ct">Upgrade governance trade-off</p><p class="cb">Longer timelock = safer but slower incident response. Higher multisig threshold (M-of-N) = harder to compromise but harder to act quickly during a crisis. Tune both to your actual threat model.</p></div>
+</div>
+<button onclick="sendPrompt('Compare Hyperledger Fabric, Besu, and Corda for an enterprise consortium blockchain use case — what are the real architectural and governance differences that should drive the choice?')">Hyperledger Fabric vs Besu vs Corda ↗</button>
+</div>
+
+<!-- TAB 6: TOKENOMICS & MEV -->
+<div class="gsec" id="s6" data-label="Tokenomics & MEV">
+<p class="lbl" style="margin-top:0">The economic layer</p>
+<h3 class="sec-t">Mechanism design, AMM math & MEV mitigation</h3>
+<p class="sec-s">Principal engineers are frequently the last line of defense against economically exploitable designs — a perfectly secure contract can still be drained by a flawed incentive structure.</p>
+
+<p class="lbl">AMM algorithm comparison</p>
+<div class="math">
+<span class="mc">// Constant product (Uniswap v2) — simple, works for any pair, high slippage</span>
+x · y = k
+
+<span class="mc">// StableSwap invariant (Curve) — flat near peg, steep away from it</span>
+A·n²·Σxᵢ + D = A·D·n² + D^(n+1) / (n^n · Πxᵢ)
+
+<span class="mc">// Concentrated liquidity (Uniswap v3) — capital efficient, active management required</span>
+L = Δx · √(P_upper · P_lower) / (√P_upper − √P_lower)
+</div>
+<div class="g4">
+  <div class="card"><p class="ct">Constant product</p><p class="cb">Universal, simple, capital inefficient outside the current price.</p></div>
+  <div class="card"><p class="ct">Constant sum</p><p class="cb">Zero slippage but breaks (drains one side) if assets aren't truly 1:1.</p></div>
+  <div class="card"><p class="ct">StableSwap</p><p class="cb">Curve's invariant — minimal slippage for pegged assets near the peg.</p></div>
+  <div class="card"><p class="ct">Concentrated liquidity</p><p class="cb">LPs choose price ranges — far more capital efficient, far more complex.</p></div>
+</div>
+
+<p class="lbl">Auction mechanism toolkit</p>
+<div class="g4">
+  <div class="card"><p class="ct">Dutch auction</p><p class="cb">Price starts high, decreases over time until a buyer accepts — used in NFT mints and token launches to discover price fairly.</p></div>
+  <div class="card"><p class="ct">Batch auction</p><p class="cb">Orders collected over a window, cleared at one uniform price — neutralizes transaction-ordering MEV entirely.</p></div>
+  <div class="card"><p class="ct">VCG mechanism</p><p class="cb">Truthful-bidding auction design — theoretically optimal but computationally expensive, rare in production.</p></div>
+  <div class="card"><p class="ct">TWAP pricing</p><p class="cb">Time-weighted average price resists single-block manipulation — the standard defense for on-chain price oracles.</p></div>
+</div>
+
+<p class="lbl">MEV mitigation algorithms</p>
+<div class="g4">
+  <div class="card"><p class="ct">PBS</p><p class="cb">Proposer-Builder Separation — splits block construction from proposal to limit a single actor's extraction power.</p></div>
+  <div class="card"><p class="ct">Encrypted mempools</p><p class="cb">SUAVE, Shutter — transactions are encrypted until inclusion is committed, blinding searchers to content.</p></div>
+  <div class="card"><p class="ct">Fair ordering</p><p class="cb">Threshold encryption schemes that enforce first-seen or randomized ordering rather than highest-bidder ordering.</p></div>
+  <div class="card"><p class="ct">MEV redistribution</p><p class="cb">MEV-Share and similar protocols return a portion of extracted value back to the user whose transaction created the opportunity.</p></div>
+</div>
+
+<p class="lbl">Governance mechanism trade-offs</p>
+<table class="t">
+  <thead><tr><th>Mechanism</th><th>Strength</th><th>Weakness</th></tr></thead>
+  <tbody>
+    <tr><td class="lc">Token-weighted voting</td><td>Simple, aligns with capital at risk</td><td>Plutocratic — whales dominate outcomes</td></tr>
+    <tr><td class="lc">Quadratic voting</td><td>Limits whale dominance (cost grows with votes²)</td><td>Vulnerable to Sybil attacks without identity</td></tr>
+    <tr><td class="lc">Conviction voting</td><td>Rewards sustained commitment over snap votes</td><td>Slower, harder for newcomers to influence</td></tr>
+    <tr><td class="lc">Delegation</td><td>Improves participation via expert delegates</td><td>Re-creates centralization around top delegates</td></tr>
+  </tbody>
+</table>
+<button onclick="sendPrompt('Walk me through how the Curve StableSwap invariant actually works mathematically — why does it behave like constant-sum near the peg and constant-product away from it?')">How Curve StableSwap math actually works ↗</button>
+</div>
+
+<!-- TAB 7: FREELANCE & CAREER STRATEGY -->
+<div class="gsec" id="s7" data-label="Freelance & career">
+<p class="lbl" style="margin-top:0">The business of being a principal</p>
+<h3 class="sec-t">Scoping, pricing & building credibility</h3>
+<p class="sec-s">Technical mastery alone doesn't make a successful freelance principal engineer — the business layer (scoping, contracts, pricing, reputation) is where most technically excellent engineers actually struggle.</p>
+
+<p class="lbl">Scoping & estimating web3 projects</p>
+<div class="card" style="margin-bottom:1rem">
+  <p class="cb">Web3 estimates need complexity multipliers that web2 projects don't: audit budget (typically 15–30% of dev cost for anything holding real value), multi-chain deployment overhead, novel mechanism design requiring economic modeling before code, and a mandatory testnet-soak period before mainnet. A "simple" token contract with a non-standard vesting curve can hide weeks of edge-case testing.</p>
+</div>
+
+<p class="lbl">Pricing models compared</p>
+<div class="cmp" style="grid-template-columns:1fr 1fr 1fr">
+  <div class="cc0"><div class="ch">Model</div><div class="cr">Best for</div><div class="cr">Risk holder</div></div>
+  <div class="cc"><div class="ch">Fixed-bid</div><div class="cr">Well-specified, standard work (ERC-20, simple NFT)</div><div class="cr">You — scope creep is your problem</div></div>
+  <div class="cc"><div class="ch">Milestone-based</div><div class="cr">Most protocol/DeFi engagements</div><div class="cr">Shared — define milestones precisely</div></div>
+  <div class="cc"><div class="ch">Retainer</div><div class="cr">Ongoing audits, security advisory, principal-as-CTO</div><div class="cr">Client — predictable cost for them</div></div>
+</div>
+<div class="note"><i class="ti ti-alert-triangle" aria-hidden="true" style="font-size:14px;margin-right:5px"></i>Be wary of equity/token-only compensation for security-critical work — your liability exposure (reputational, sometimes legal) doesn't disappear if the token goes to zero.</div>
+
+<p class="lbl">Client due diligence — red flags</p>
+<div class="checklist">
+  <div class="ci"><i class="ti ti-flag" aria-hidden="true" style="font-size:14px;color:var(--text-danger);flex-shrink:0;margin-top:2px"></i><span>Unrealistic timeline that doesn't leave room for an audit cycle before mainnet.</span></div>
+  <div class="ci"><i class="ti ti-flag" aria-hidden="true" style="font-size:14px;color:var(--text-danger);flex-shrink:0;margin-top:2px"></i><span>No audit budget at all, or pressure to "skip it this time" for a time-sensitive launch.</span></div>
+  <div class="ci"><i class="ti ti-flag" aria-hidden="true" style="font-size:14px;color:var(--text-danger);flex-shrink:0;margin-top:2px"></i><span>Anonymous team requesting unaudited deployment with admin keys held by a single EOA.</span></div>
+  <div class="ci"><i class="ti ti-flag" aria-hidden="true" style="font-size:14px;color:var(--text-danger);flex-shrink:0;margin-top:2px"></i><span>Requests to build mechanisms explicitly designed to mislead users about risk or returns.</span></div>
+</div>
+
+<p class="lbl">Building principal-level credibility</p>
+<div class="g3">
+  <div class="card"><p class="ct">Verified portfolio</p><p class="cb">Source-verified mainnet contracts on Etherscan/Solscan are stronger proof than any resume claim.</p></div>
+  <div class="card"><p class="ct">Audit contests</p><p class="cb">Code4rena, Sherlock, and CodeHawks competitive audits build a public, scored security track record.</p></div>
+  <div class="card"><p class="ct">Open source + writing</p><p class="cb">Contributing to OpenZeppelin, Foundry, or Anchor — and writing about it — compounds reputation faster than private client work alone.</p></div>
+</div>
+
+<p class="lbl">Principal-level soft skills</p>
+<div class="g3">
+  <div class="card"><p class="ct">Architecture decision records</p><p class="cb">Document why, not just what — future engineers (and auditors) need the reasoning behind a trade-off, not just the outcome.</p></div>
+  <div class="card"><p class="ct">Risk translation</p><p class="cb">Converting "reentrancy vulnerability in withdraw()" into "this could result in total loss of treasury funds" for a non-technical board.</p></div>
+  <div class="card"><p class="ct">Mentorship & audit leadership</p><p class="cb">At principal level you're often reviewing other engineers' contracts, not just writing your own — calibrated, constructive code review is a distinct skill.</p></div>
+</div>
+<button onclick="sendPrompt('What should a smart contract development and audit services agreement actually include to protect a freelance principal engineer — liability limitations, IP assignment, and scope boundaries?')">What should a freelance contract template include? ↗</button>
+</div>
+
+</div>
+
+<script>
+(function(){
+  var nav=document.getElementById('gnav');
+  var secs=document.querySelectorAll('.gsec');
+  function show(id){
+    secs.forEach(function(s){s.style.display='none'});
+    document.getElementById(id).style.display='block';
+    nav.querySelectorAll('.gtab').forEach(function(b){b.classList.remove('active')});
+    nav.querySelector('[data-t="'+id+'"]').classList.add('active');
+  }
+  secs.forEach(function(s,i){
+    var b=document.createElement('button');
+    b.className='gtab'+(i===0?' active':'');
+    b.dataset.t=s.id;
+    b.textContent=s.dataset.label;
+    b.onclick=function(){show(s.id)};
+    nav.appendChild(b);
+    if(i>0)s.style.display='none';
+  });
+  nav.style.display='flex';
+})();
+</script>
